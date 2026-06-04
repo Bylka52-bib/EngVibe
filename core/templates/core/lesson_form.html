@@ -1,0 +1,86 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{ title }} - EngVibe{% endblock %}
+{% block body_class %}page-bento-form page-lesson-editor{% endblock %}
+{% block content %}
+<section class="page-shell bento-form-page lesson-editor-page">
+    <div class="container lesson-editor-container">
+        <div class="bento-form-hero muted-band lesson-editor-hero">
+            <h1>{{ title }}</h1>
+            <p class="page-lead bento-form-lead">
+                Полноэкранный редактор: выравнивание картинок, обтекание текстом, цвет отдельных ячеек таблицы,
+                блоки «текст + медиа» слева или справа.
+            </p>
+        </div>
+
+        <form method="post" class="lesson-editor-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="lesson-editor-meta surface-card bento-highlight bento-form-card">
+                <h2 class="lesson-editor-meta__title">Параметры урока</h2>
+                <p class="lesson-editor-meta__lead">Название, курс, длительность и ссылки – всё, что видит ученик в каталоге и на странице урока.</p>
+                <div class="lesson-editor-meta-grid">
+                    <div class="lesson-editor-meta-field lesson-editor-meta-field--course">
+                        {% include 'core/includes/bento_form_field.html' with field=form.course only %}
+                    </div>
+                    <div class="lesson-editor-meta-field lesson-editor-meta-field--title">
+                        {% include 'core/includes/bento_form_field.html' with field=form.title only %}
+                    </div>
+                    <div class="lesson-editor-meta-field lesson-editor-meta-field--description">
+                        {% include 'core/includes/bento_form_field.html' with field=form.description only %}
+                    </div>
+                    <div class="lesson-editor-meta-field lesson-editor-meta-field--video_url">
+                        {% include 'core/includes/bento_form_field.html' with field=form.video_url only %}
+                    </div>
+                    <div class="lesson-editor-meta-field lesson-editor-meta-field--exercise_url">
+                        {% include 'core/includes/bento_form_field.html' with field=form.exercise_url only %}
+                    </div>
+                    <div class="lesson-editor-meta-field lesson-editor-meta-field--duration_minutes">
+                        {% include 'core/includes/bento_form_field.html' with field=form.duration_minutes only %}
+                    </div>
+                    <div class="lesson-editor-meta-field lesson-editor-meta-field--order">
+                        {% include 'core/includes/bento_form_field.html' with field=form.order only %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="lesson-editor-workspace surface-card bento-highlight">
+                <div class="lesson-editor-block">
+                    <label for="id_material">{{ form.material.label }}</label>
+                    <textarea
+                        name="material"
+                        id="id_material"
+                        class="lesson-editor-field"
+                        data-upload-url="{% url 'core:lesson_upload_image' %}"
+                        data-csrf-token="{{ csrf_token }}"
+                        data-content-css="{% static 'core/css/lesson_content.css' %}"
+                    >{{ form.material.value|default_if_none:'' }}</textarea>
+                    {{ form.material.errors }}
+                </div>
+            </div>
+
+            <div class="bento-form-actions lesson-editor-actions">
+                <button class="btn btn-primary btn-pill" type="submit">Сохранить</button>
+                <a class="btn btn-outline-pink btn-pill" href="{{ form_cancel_url }}">Отмена</a>
+            </div>
+        </form>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js"></script>
+<script>
+  (function () {
+    var el = document.getElementById('id_material');
+    if (el && el.dataset.contentCss) {
+      window.__lessonEditorContentCss = el.dataset.contentCss;
+    }
+    window.__lessonPlaceholderImg = 'data:image/svg+xml,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260">' +
+      '<rect fill="#ffe7ea" width="400" height="260" rx="16"/>' +
+      '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f14d62" font-family="sans-serif" font-size="16">Загрузите изображение</text></svg>'
+    );
+  })();
+</script>
+<script src="{% static 'core/js/lesson_editor.js' %}"></script>
+{% include 'core/includes/bento_form_assets.html' %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Курсы - EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell">
+    <div class="container">
+        <div class="muted-band">
+            <h1>Каталог курсов</h1>
+            <p class="page-lead">Выберите программу по уровню и цели. Уроки и тесты открываются по <a href="{% url 'core:tariffs' %}">тарифу</a> или при <strong>разовой покупке</strong> курса.</p>
+            <div class="courses-grid courses-grid--catalog">
+                {% for course in courses %}
+                    {% cycle 'core/img/course-1.jpg' 'core/img/course-2.jpg' 'core/img/course-3.jpg' 'core/img/course-4.jpg' as default_course_img silent %}
+                    <article class="course-card">
+                        <div class="course-card__img">
+                            {% if course.thumbnail %}
+                                <img loading="lazy" src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+                            {% else %}
+                                <img loading="lazy" src="{% static default_course_img %}" alt="{{ course.title }}">
+                            {% endif %}
+                        </div>
+                        <div>
+                            <p class="course-card__level">{{ course.level }}</p>
+                            <p class="course-card__desc">{{ course.short_description }}</p>
+                        </div>
+                        <div class="course-card__foot">
+                            <a href="{% url 'core:course_detail' course.slug %}">
+                                <img loading="lazy" src="{% static 'core/img/icon-arrow-go.svg' %}" alt="">
+                                {{ course.price }} р
+                            </a>
+                        </div>
+                    </article>
+                {% empty %}
+                    <article class="course-card">
+                        <h2>Курсы пока не добавлены</h2>
+                        <p>Добавьте курсы в панели управления.</p>
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

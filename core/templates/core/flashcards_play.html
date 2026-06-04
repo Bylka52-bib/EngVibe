@@ -1,0 +1,218 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{ group.name }} – карточки{% endblock %}
+{% block content %}
+<section class="page-shell flashcards-play-page">
+    <div class="container flashcards-play-container">
+        <a href="{% url 'core:flashcards_groups' %}" class="meta flashcards-back-link">
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M0.787609 4.90391C0.356102 4.90052 0.00355488 5.24759 0.000171665 5.67909C-0.00321131 6.1106 0.343851 6.46315 0.775358 6.46653L0.781483 5.68522L0.787609 4.90391ZM15.0197 6.34935C15.3273 6.04662 15.3311 5.55193 15.0284 5.24441L10.0951 0.233193C9.79242 -0.07432 9.29772 -0.0781986 8.99021 0.22453C8.68269 0.527259 8.67882 1.02196 8.98155 1.32947L13.3667 5.78389L8.91224 10.169C8.60473 10.4717 8.60085 10.9664 8.90358 11.2739C9.20631 11.5815 9.70101 11.5853 10.0085 11.2826L15.0197 6.34935ZM0.781483 5.68522L0.775358 6.46653L14.4655 6.57386L14.4716 5.79255L14.4777 5.01124L0.787609 4.90391L0.781483 5.68522Z" fill="#F04769"/>
+            </svg>
+            К выбору групп
+        </a>
+        <div class="container container--narrow">
+            <div class="flashcards-play-header">
+            <h1>{{ group.name }}</h1>
+            <p class="meta flashcards-play-stats">
+                Сессия: <span id="fc-session-num">{{ current_num }}</span> / <span id="fc-session-total">{{ session_total }}</span>
+                · Выучено: <span id="fc-learned">{{ progress.learned }}</span> / <span id="fc-total">{{ progress.total }}</span>
+            </p>
+            <div class="progress-line"><span id="fc-progress-bar" style="width: {{ progress.percent }}%;"></span></div>
+            {% if can_restart_session %}
+                <a class="btn btn-outline-pink btn-pill btn-compact flashcards-restart-btn" href="{% url 'core:flashcards_play' group.slug %}?restart=1" data-confirm-restart>Начать сначала</a>
+            {% endif %}
+            </div>
+
+            <div class="flashcard-scene" id="flashcard-scene">
+                <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Перевернуть карточку" aria-pressed="false">
+                    <div class="flashcard-inner fc-swap-transition" id="flashcard-inner">
+                        <div class="flashcard-face flashcard-front">
+                            <span class="flashcard-label">English</span>
+                            <p class="flashcard-word" id="fc-word-en">{{ card.word_en }}</p>
+                            <p class="flashcard-hint">Нажмите, чтобы перевернуть</p>
+                        </div>
+                        <div class="flashcard-face flashcard-back">
+                            <span class="flashcard-label">Русский</span>
+                            <p class="flashcard-word" id="fc-word-ru">{{ card.word_ru }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcards-actions" id="fc-answer-actions" hidden>
+                <button type="button" class="btn btn-outline-pink btn-pill" id="fc-btn-unknown">Не знаю</button>
+                <button type="button" class="btn btn-primary btn-pill" id="fc-btn-known">Знаю</button>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+(function () {
+    var EXIT_MS = 260;
+    var ENTER_MS = 300;
+
+    var sceneEl = document.getElementById('flashcard-scene');
+    var cardEl = document.getElementById('flashcard');
+    var innerEl = document.getElementById('flashcard-inner');
+    var actionsEl = document.getElementById('fc-answer-actions');
+    var flipped = false;
+    var hasRevealed = false;
+    var busy = false;
+    var cardId = {{ card.id }};
+    var answerUrl = "{% url 'core:flashcards_answer' group.slug %}";
+    var csrfToken = "{{ csrf_token }}";
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) {
+        EXIT_MS = 0;
+        ENTER_MS = 0;
+    }
+
+    function delay(ms) {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    function setFlipped(state) {
+        flipped = state;
+        cardEl.classList.toggle('is-flipped', flipped);
+        cardEl.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+    }
+
+    function resetFlip() {
+        innerEl.classList.add('fc-swap-no-transition');
+        setFlipped(false);
+        innerEl.classList.remove('fc-swap-no-transition');
+        hasRevealed = false;
+        actionsEl.hidden = true;
+        actionsEl.classList.remove('is-hidden-during-swap');
+    }
+
+    function resetCardVisual() {
+        sceneEl.classList.remove('fc-tone-known', 'fc-tone-unknown');
+        cardEl.classList.remove('fc-slide-out', 'fc-slide-in', 'fc-slide-in-active', 'is-busy');
+        cardEl.style.transform = '';
+        cardEl.style.opacity = '';
+    }
+
+    function playExit(known) {
+        innerEl.classList.add('fc-swap-no-transition');
+        setFlipped(false);
+        innerEl.classList.remove('fc-swap-no-transition');
+
+        sceneEl.classList.remove('fc-tone-known', 'fc-tone-unknown');
+        sceneEl.classList.add(known ? 'fc-tone-known' : 'fc-tone-unknown');
+        cardEl.classList.add('is-busy');
+        actionsEl.classList.add('is-hidden-during-swap');
+
+        cardEl.classList.remove('fc-slide-in', 'fc-slide-in-active');
+        cardEl.offsetHeight;
+        cardEl.classList.add('fc-slide-out');
+
+        return delay(EXIT_MS).then(function () {
+            cardEl.classList.remove('fc-slide-out');
+            sceneEl.classList.remove('fc-tone-known', 'fc-tone-unknown');
+        });
+    }
+
+    function playEnter() {
+        cardEl.classList.remove('fc-slide-out');
+        cardEl.classList.add('fc-slide-in');
+        cardEl.offsetHeight;
+        cardEl.classList.add('fc-slide-in-active');
+        return delay(ENTER_MS).then(function () {
+            cardEl.classList.remove('fc-slide-in', 'fc-slide-in-active');
+        });
+    }
+
+    function updateProgress(data) {
+        if (!data.progress) return;
+        document.getElementById('fc-learned').textContent = data.progress.learned;
+        document.getElementById('fc-total').textContent = data.progress.total;
+        document.getElementById('fc-progress-bar').style.width = data.progress.percent + '%';
+    }
+
+    function applyNextCard(data) {
+        cardId = data.card.id;
+        document.getElementById('fc-word-en').textContent = data.card.word_en;
+        document.getElementById('fc-word-ru').textContent = data.card.word_ru;
+        document.getElementById('fc-session-num').textContent = data.current_num;
+        document.getElementById('fc-session-total').textContent = data.session_total;
+        resetFlip();
+    }
+
+    function releaseBusy(showActions) {
+        cardEl.classList.remove('is-busy');
+        busy = false;
+        if (showActions && hasRevealed) {
+            actionsEl.hidden = false;
+            actionsEl.classList.remove('is-hidden-during-swap');
+        }
+    }
+
+    cardEl.addEventListener('click', function () {
+        if (busy) return;
+        setFlipped(!flipped);
+        if (!hasRevealed) {
+            hasRevealed = true;
+            actionsEl.hidden = false;
+            actionsEl.classList.remove('is-hidden-during-swap');
+        }
+    });
+
+    cardEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            cardEl.click();
+        }
+    });
+
+    function sendAnswer(known) {
+        if (busy || !hasRevealed) return;
+        busy = true;
+        cardEl.classList.add('is-busy');
+
+        var fetchPromise = fetch(answerUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ card_id: cardId, known: !!known })
+        }).then(function (r) { return r.json(); });
+
+        Promise.all([playExit(known), fetchPromise])
+            .then(function (results) {
+                var data = results[1];
+                if (data.error) {
+                    resetCardVisual();
+                    alert(data.error);
+                    releaseBusy(true);
+                    return;
+                }
+                updateProgress(data);
+                if (data.done) {
+                    window.location.href = data.redirect_url;
+                    return;
+                }
+                applyNextCard(data);
+                return playEnter();
+            })
+            .then(function () {
+                if (!busy) return;
+                resetCardVisual();
+                releaseBusy(false);
+            })
+            .catch(function () {
+                resetCardVisual();
+                alert('Ошибка сети. Попробуйте ещё раз.');
+                releaseBusy(true);
+            });
+    }
+
+    document.getElementById('fc-btn-known').addEventListener('click', function () { sendAnswer(true); });
+    document.getElementById('fc-btn-unknown').addEventListener('click', function () { sendAnswer(false); });
+})();
+</script>
+{% include 'core/includes/flashcards_confirm.html' %}
+{% endblock %}

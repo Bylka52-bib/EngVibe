@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EngVibe{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/icon-logo.svg' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="header-logo" href="{% if subscription_setup_pending %}{% url 'core:subscription_setup' %}{% else %}{% url 'core:home' %}{% endif %}">
+            <img loading="lazy" src="{% static 'core/img/logo-header.svg' %}" width="278" height="60" alt="EngVibe">
+        </a>
+        {% if not subscription_setup_pending %}
+        <nav class="header-nav" aria-label="Основное меню">
+            <a href="{% url 'core:courses' %}">Курсы</a>
+            <a href="{% url 'core:tariffs' %}">Тарифы</a>
+            <a href="{% url 'core:about' %}">О нас</a>
+            <a href="{% url 'core:home' %}#contacts">Контакты</a>
+            <a href="{% url 'core:home' %}#faq">FAQ</a>
+        </nav>
+        {% endif %}
+        <div class="header-actions">
+            {% if user.is_authenticated %}
+                {% if subscription_setup_pending %}
+                    <a class="btn btn-primary btn-pill" href="{% url 'core:logout' %}">Выйти</a>
+                {% else %}
+                    <a class="btn btn-primary btn-pill" href="{% url 'core:profile' %}">Кабинет</a>
+                {% endif %}
+            {% else %}
+                <a class="btn btn-primary btn-pill" href="{% url 'core:signup' %}">Зарегистрироваться</a>
+            {% endif %}
+        </div>
+        {% if not subscription_setup_pending %}
+        <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
+            <span></span><span></span><span></span>
+        </button>
+        {% endif %}
+    </div>
+</header>
+{% if not subscription_setup_pending %}
+<nav class="mobile-menu" id="mobile-menu" aria-label="Мобильное меню">
+    <a href="{% url 'core:courses' %}">Курсы</a>
+    <a href="{% url 'core:tariffs' %}">Тарифы</a>
+    <a href="{% url 'core:about' %}">О нас</a>
+    <a href="{% url 'core:home' %}#contacts">Контакты</a>
+    <a href="{% url 'core:home' %}#faq">FAQ</a>
+    {% if user.is_authenticated %}
+        <a class="mobile-menu__cta" href="{% url 'core:profile' %}">Кабинет</a>
+        <a href="{% url 'core:logout' %}">Выйти</a>
+    {% else %}
+        <a class="mobile-menu__cta" href="{% url 'core:signup' %}">Зарегистрироваться</a>
+    {% endif %}
+</nav>
+{% endif %}
+
+<div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+{% if messages %}
+    {% for message in messages %}
+        <div class="django-msg-payload" hidden data-level="{{ message.level_tag|default:'info' }}" data-text="{{ message|escape }}"></div>
+    {% endfor %}
+{% endif %}
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer" id="contacts">
+    <div class="container">
+        <div class="footer-top">
+            <a class="footer-logo" href="{% url 'core:home' %}">
+                <img loading="lazy" src="{% static 'core/img/logo-footer.svg' %}" width="213" height="46" alt="EngVibe">
+            </a>
+            {% if not subscription_setup_pending %}
+            <nav class="footer-nav" aria-label="Нижнее меню">
+                <a href="{% url 'core:courses' %}">Курсы</a>
+                <a href="{% url 'core:tariffs' %}">Тарифы</a>
+                <a href="{% url 'core:about' %}">О нас</a>
+                <a href="{% url 'core:home' %}#faq">FAQ</a>
+            </nav>
+            {% endif %}
+            <div class="footer-social" aria-label="Социальные сети">
+                <a class="footer-social__link" href="{% url 'core:social_soon' %}" title="Telegram — скоро">
+                    <img loading="lazy" src="{% static 'core/img/tg.svg' %}" width="30" height="30" alt="Telegram">
+                </a>
+                <a class="footer-social__link" href="{% url 'core:social_soon' %}" title="TikTok — скоро">
+                    <img loading="lazy" src="{% static 'core/img/tiktok.svg' %}" width="30" height="30" alt="TikTok">
+                </a>
+                <a class="footer-social__link" href="{% url 'core:social_soon' %}" title="Instagram — скоро">
+                    <img loading="lazy" src="{% static 'core/img/insta.svg' %}" width="30" height="30" alt="Instagram">
+                </a>
+            </div>
+        </div>
+        <div class="footer-mid">
+            <div class="footer-contacts">
+                <h3>Контакты</h3>
+                <p>Email: engvibe@mail.ru</p>
+                <p>Телефон: +7 (000) 00-00</p>
+            </div>
+            <form class="newsletter-box" method="post" action="{% url 'core:newsletter' %}">
+                {% csrf_token %}
+                <label class="visually-hidden" for="footer-email">Email</label>
+                <input id="footer-email" name="email" type="email" autocomplete="email" placeholder="Email" required>
+                <button class="btn btn-primary btn-pill" type="submit">Следить за новостями</button>
+            </form>
+        </div>
+        <div class="footer-bottom">
+            <p>© {% now "Y" %} EngVibe. Все права защищены.</p>
+            <p><a href="#">Политика конфиденциальности</a></p>
+        </div>
+    </div>
+</footer>
+<script>
+    const menuToggle = document.querySelector('.menu-toggle');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    if (menuToggle && mobileMenu) {
+        function setMobileMenuOpen(open) {
+            mobileMenu.classList.toggle('is-open', open);
+            menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            menuToggle.classList.toggle('is-open', open);
+            document.body.classList.toggle('mobile-menu-open', open);
+        }
+
+        menuToggle.addEventListener('click', function () {
+            setMobileMenuOpen(!mobileMenu.classList.contains('is-open'));
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && mobileMenu.classList.contains('is-open')) {
+                setMobileMenuOpen(false);
+            }
+        });
+
+        mobileMenu.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                setMobileMenuOpen(false);
+            });
+        });
+    }
+    (function () {
+        var stack = document.getElementById('toast-stack');
+        if (!stack) return;
+        var payloads = document.querySelectorAll('.django-msg-payload');
+        payloads.forEach(function (node) {
+            var level = node.getAttribute('data-level') || 'info';
+            var text = node.getAttribute('data-text') || '';
+            node.remove();
+            var el = document.createElement('div');
+            el.className = 'toast toast--' + level;
+            el.setAttribute('role', 'status');
+            el.textContent = text;
+            stack.appendChild(el);
+            requestAnimationFrame(function () { el.classList.add('is-visible'); });
+            setTimeout(function () {
+                el.classList.remove('is-visible');
+                setTimeout(function () { el.remove(); }, 300);
+            }, 5200);
+        });
+    })();
+</script>
+</body>
+</html>

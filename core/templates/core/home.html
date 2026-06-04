@@ -1,0 +1,346 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}EngVibe - Онлайн школа английского{% endblock %}
+{% block body_class %}page-home{% endblock %}
+{% block content %}
+
+<img loading="lazy" class="hero-blob" src="{% static 'core/img/hero-blob.svg' %}" alt="" aria-hidden="true">
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-left-wrap">
+            
+            <div class="hero-left">
+                <span class="chip">Онлайн платформа</span>
+                <h1 class="hero-title">Учи английский вайбово!</h1>
+                <p class="hero-lead">Интерактивные курсы для любого уровня! Говори уверенно, понимай легко, достигай своих целей.</p>
+                <div class="hero-features">
+                    <div class="hero-feature">
+                        <img loading="lazy" src="{% static 'core/img/feat-level.svg' %}" alt="" width="40" height="40">
+                        <span>От A1 до C1</span>
+                    </div>
+                    <div class="hero-feature">
+                        <img loading="lazy" src="{% static 'core/img/feat-interactive.svg' %}" alt="" width="40" height="40">
+                        <span>Интерактивные<br>уроки и практика</span>
+                    </div>
+                    <div class="hero-feature hero-feature--curator">
+                        <span class="hero-feature-icon-wrap">
+                            <img loading="lazy" src="{% static 'core/img/feat-curator.svg' %}" alt="" width="28" height="28">
+                        </span>
+                        <span>Поддержка<br>кураторов</span>
+                    </div>
+                </div>
+                <div class="hero-cta-row">
+                    <a class="btn btn-primary btn-pill" href="{% url 'core:courses' %}">Начать обучение</a>
+                    <a class="hero-watch" href="{% url 'core:home' %}#how-it-works">
+                        <img loading="lazy" src="{% static 'core/img/play-circle.svg' %}" alt="" width="60" height="60">
+                        <span>
+                            <strong>Посмотреть</strong>
+                            <span>как это работает</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <img loading="lazy" src="{% static 'core/img/course-1.svg' %}" alt="Иллюстрация курсов EngVibe" >
+            <div class="hero-float-card">
+                <img loading="lazy" src="{% static 'core/img/icon-play.svg' %}" alt="" width="40" height="40">
+                <div>
+                    <div class="t">Современные материалы</div>
+                    <div class="d">для эффективного обучения</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<img loading="lazy" class="why-blob-bg" src="{% static 'core/img/why-blob.svg' %}" alt="" aria-hidden="true">
+
+<div class="stats-row-wrap-adaptiv">
+    <div class="stats-row">
+        <article class="stat-card stat-card--pink">
+            <img loading="lazy" src="{% static 'core/img/stat-cap.svg' %}" alt="" width="72" height="70">
+            <h3>{{ stats.courses_count }}+</h3>
+            <p>Курсов</p>
+        </article>
+        <article class="stat-card stat-card--orange">
+            <img loading="lazy" src="{% static 'core/img/stat-users.svg' %}" alt="" width="72" height="70">
+            <h3>10K+</h3>
+            <p>Учеников</p>
+        </article>
+        <article class="stat-card stat-card--gold">
+            <img loading="lazy" src="{% static 'core/img/stat-star.svg' %}" alt="" width="72" height="70">
+            <h3>{{ stats.rating }}</h3>
+            <p>Средний рейтинг</p>
+        </article>
+    </div>
+    </div>
+
+<section class="container why-section">
+    
+    <div class="why-layout">
+        <div class="why-left-col">
+    <div class="stats-row-wrap">
+    <div class="stats-row">
+        <article class="stat-card stat-card--pink">
+            <img loading="lazy" src="{% static 'core/img/stat-cap.svg' %}" alt="" width="72" height="70">
+            <h3>{{ stats.courses_count }}+</h3>
+            <p>Курсов</p>
+        </article>
+        <article class="stat-card stat-card--orange">
+            <img loading="lazy" src="{% static 'core/img/stat-users.svg' %}" alt="" width="72" height="70">
+            <h3>10K+</h3>
+            <p>Учеников</p>
+        </article>
+        <article class="stat-card stat-card--gold">
+            <img loading="lazy" src="{% static 'core/img/stat-star.svg' %}" alt="" width="72" height="70">
+            <h3>{{ stats.rating }}</h3>
+            <p>Средний рейтинг</p>
+        </article>
+    </div>
+    </div>
+
+            <div class="why-bottom">
+                <div class="why-mascot">
+                    <img loading="lazy" src="{% static 'core/img/why-people.svg' %}" alt="">
+                </div>
+                <div class="why-mini">
+                    <h3>Учись. Практикуй.<br> Достигай!</h3>
+                    <p>Мы сделаем изучение английского увлекательным и результативным.</p>
+                    <a class="btn btn-primary btn-pill btn-inline-arrow" href="{% url 'core:how_it_works' %}">
+                        Узнать больше
+                        <img loading="lazy" class="btn-arrow-icon" src="{% static 'core/img/arrow-small.svg' %}" alt="">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="why-right-1">
+<div class="why-right">
+            <h2 class="why-heading">Почему EngVibe?</h2>
+            <div class="why-list">
+                <div class="why-item">
+                    <div class="why-item-icon"><img loading="lazy" src="{% static 'core/img/why-cal.svg' %}" alt=""></div>
+                    <div>
+                        <h4>Гибкий график</h4>
+                        <p>Учись в любое время</p>
+                    </div>
+                </div>
+                <div class="why-item">
+                    <div class="why-item-icon"><img loading="lazy" src="{% static 'core/img/why-practice.svg' %}" alt=""></div>
+                    <div>
+                        <h4>Практика с первого урока</h4>
+                        <p>Разговорные навыки с самого начала</p>
+                    </div>
+                </div>
+                <div class="why-item">
+                    <div class="why-item-icon"><img loading="lazy" src="{% static 'core/img/why-device.svg' %}" alt=""></div>
+                    <div>
+                        <h4>Доступ с любого устройства</h4>
+                        <p>Занимайся где угодно</p>
+                    </div>
+                </div>
+                <div class="why-item">
+                    <div class="why-item-icon"><img loading="lazy" src="{% static 'core/img/why-trend.svg' %}" alt=""></div>
+                    <div>
+                        <h4>Прогресс и мотивация</h4>
+                        <p>Отслеживай достижения</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="why-right-2">
+            <img loading="lazy" src="{% static 'core/img/img.svg' %}" alt="">
+        </div>
+        </div>
+        
+    </div>
+</section>
+
+
+<section class="container section-courses" id="popular-courses">
+    <div class="section-head">
+        <h2>Популярные курсы</h2>
+        <a class="btn btn-outline-pink btn-pill section-courses__all-btn" href="{% url 'core:courses' %}">
+            Все курсы
+            <img loading="lazy" class="btn-arrow-icon" src="{% static 'core/img/arrow-allcourses.svg' %}" alt="">
+        </a>
+    </div>
+    <div class="courses-grid">
+        {% for course in courses %}
+            {% cycle 'core/img/course-1.jpg' 'core/img/course-2.jpg' 'core/img/course-3.jpg' 'core/img/course-4.jpg' as default_course_img silent %}
+            <article class="course-card">
+                <div class="course-card__img">
+                    {% if course.thumbnail %}
+                        <img loading="lazy" src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+                    {% else %}
+                        <img loading="lazy" src="{% static default_course_img %}" alt="{{ course.title }}">
+                    {% endif %}
+                </div>
+                <div>
+                    <p class="course-card__level">{{ course.level }}</p>
+                    <p class="course-card__desc">{{ course.short_description }}</p>
+                </div>
+                <div class="course-card__foot">
+                    <a href="{% url 'core:course_detail' course.slug %}">
+                        <img loading="lazy" src="{% static 'core/img/icon-arrow-go.svg' %}" alt="">
+                        {{ course.price }} р
+                    </a>
+                </div>
+            </article>
+        {% empty %}
+            <article class="course-card">
+                <div class="course-card__img"><img loading="lazy" src="{% static 'core/img/course-1.jpg' %}" alt=""></div>
+                <div><p class="course-card__level">A2-B1</p><p class="course-card__desc">Английский для продолжающих</p></div>
+                <div class="course-card__foot"><a href="{% url 'core:courses' %}"><img loading="lazy" src="{% static 'core/img/icon-arrow-go.svg' %}" alt="">2000 р</a></div>
+            </article>
+            <article class="course-card">
+                <div class="course-card__img"><img loading="lazy" src="{% static 'core/img/course-2.jpg' %}" alt=""></div>
+                <div><p class="course-card__level">A1-A2</p><p class="course-card__desc">Стартовый английский</p></div>
+                <div class="course-card__foot"><a href="{% url 'core:courses' %}"><img loading="lazy" src="{% static 'core/img/icon-arrow-go.svg' %}" alt="">1500 р</a></div>
+            </article>
+            <article class="course-card">
+                <div class="course-card__img"><img loading="lazy" src="{% static 'core/img/course-3.jpg' %}" alt=""></div>
+                <div><p class="course-card__level">C1-C2</p><p class="course-card__desc">Английский для профи</p></div>
+                <div class="course-card__foot"><a href="{% url 'core:courses' %}"><img loading="lazy" src="{% static 'core/img/icon-arrow-go.svg' %}" alt="">2500 р</a></div>
+            </article>
+            <article class="course-card">
+                <div class="course-card__img"><img loading="lazy" src="{% static 'core/img/course-4.jpg' %}" alt=""></div>
+                <div><p class="course-card__level">A2-B2</p><p class="course-card__desc">Английский через фильмы и сериалы</p></div>
+                <div class="course-card__foot"><a href="{% url 'core:courses' %}"><img loading="lazy" src="{% static 'core/img/icon-arrow-go.svg' %}" alt="">1800 р</a></div>
+            </article>
+        {% endfor %}
+    </div>
+    <a class="btn btn-outline-pink btn-pill section-courses__all-btn section-courses__all-btn--mobile" href="{% url 'core:courses' %}">
+        Все курсы
+        <img loading="lazy" class="btn-arrow-icon" src="{% static 'core/img/arrow-allcourses.svg' %}" alt="">
+    </a>
+</section>
+
+<img loading="lazy" class="about-blob" src="{% static 'core/img/about-blob.svg' %}" alt="" aria-hidden="true">
+<img loading="lazy" class="faq-blob" src="{% static 'core/img/faq-blob.svg' %}" alt="" aria-hidden="true">
+<section class="container about-steps-wrap" id="about-company">
+    
+    <div class="about-steps-grid">
+        <div class="about-block">
+            <h2>О компании</h2>
+            <p>EngVibe — это современный онлайн-сервис для изучения английского языка. Мы объединяем структурированный подход с комфортной атмосферой, чтобы обучение было понятным и вдохновляющим. Никакой воды — только практика, поддержка и результат!</p>
+            <a class="btn btn-primary btn-pill" href="{% url 'core:about' %}">Узнать больше</a>
+            <h2 class="title-faq title-faq--in-about">Часто задаваемые вопросы</h2>
+        </div>
+        <div class="steps-column" id="how-it-works">
+            <h2 class="why-heading steps-column__title">Как это работает?</h2>
+            <div class="steps-grid">
+
+                    <article class="step-card"><span class="step-card__num">01</span><h3>Оформи тариф</h3><p>Подписка открывает<br>курсы на срок</p></article>
+                    <article class="step-card"><span class="step-card__num">02</span><h3>Проходи уроки</h3><p>Интерактивные<br>материалы и задания</p></article>
+                    <article class="step-card"><span class="step-card__num">03</span><h3>Практикуй</h3><p>Разговоры, тесты<br>и упражнения</p></article>
+                    <article class="step-card"><span class="step-card__num">04</span><h3>Достигай целей</h3><p>Получай сертификаты<br>и результаты</p></article>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="steps-column-adaptiv" id="how-it-works">
+            <h2 class="why-heading steps-column__title">Как это работает?</h2>
+            <div class="steps-grid">
+
+                    <article class="step-card"><span class="step-card__num">01</span><h3>Оформи тариф</h3><p>Подписка открывает<br>курсы на срок</p></article>
+                    <article class="step-card"><span class="step-card__num">02</span><h3>Проходи уроки</h3><p>Интерактивные<br>материалы и задания</p></article>
+                    <article class="step-card"><span class="step-card__num">03</span><h3>Практикуй</h3><p>Разговоры, тесты<br>и упражнения</p></article>
+                    <article class="step-card"><span class="step-card__num">04</span><h3>Достигай целей</h3><p>Получай сертификаты<br>и результаты</p></article>
+
+            </div>
+        </div>
+
+<section class="container faq-section" id="faq">
+    <h2 class="title-faq title-faq--above-list">Часто задаваемые вопросы</h2>
+    <div class="faq-layout">
+        <div class="faq-side-img">
+            <img loading="lazy" src="{% static 'core/img/faq-side.jpg' %}" alt="">
+        </div>
+        <div class="faq-list">
+            {% for item in faqs %}
+                <details class="faq-item" {% if forloop.first %}open{% endif %}>
+                    <summary>{{ item.question }}</summary>
+                    <p class="faq-answer">{{ item.answer }}</p>
+                </details>
+            {% empty %}
+                <details class="faq-item" open>
+                    <summary>Какой уровень английского нужен для начала?</summary>
+                    <p class="faq-answer">Подойдёт любой уровень — от начального A1 до продвинутого C1. Перед началом вы пройдёте бесплатный тест для определения уровня.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Можно ли заниматься бесплатно?</summary>
+                    <p class="faq-answer">Первый урок и диагностика часто доступны бесплатно — уточните в каталоге курсов.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Как долго длится один урок?</summary>
+                    <p class="faq-answer">В среднем 20–40 минут, в зависимости от курса.</p>
+                </details>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="container reviews-section">
+    <div class="reviews-row" aria-label="Отзывы">
+        <a class="reviews-title-card" href="{% url 'core:reviews' %}">
+            <h2>Отзывы<br>наших учеников</h2>
+            <img loading="lazy" src="{% static 'core/img/reviews-chevron.svg' %}" alt="">
+        </a>
+        {% for review in reviews %}
+            {% include 'core/includes/review_card.html' with review=review %}
+        {% empty %}
+            <article class="review-card">
+                <div class="review-head">
+                    <div class="user-avatar-placeholder user-avatar-placeholder--sm" aria-hidden="true">
+                        <img loading="lazy" class="user-avatar-placeholder__icon" src="{% static 'core/img/icon-profil.svg' %}" alt="" aria-hidden="true">
+                    </div>
+                    <div>
+                        <p class="review-name">Мария</p>
+                        <div class="stars" aria-label="5 из 5">
+                            {% for _ in "12345"|make_list %}<img loading="lazy" src="{% static 'core/img/star.svg' %}" alt="">{% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="review-divider"></div>
+                <p class="text">Английский учила ещё в школе, но говорить боялась. После месяца на EngVibe начала строить простые предложения без страха. И всё это в удобном темпе</p>
+            </article>
+            <article class="review-card">
+                <div class="review-head">
+                    <div class="user-avatar-placeholder user-avatar-placeholder--sm" aria-hidden="true">
+                        <img loading="lazy" class="user-avatar-placeholder__icon" src="{% static 'core/img/icon-profil.svg' %}" alt="" aria-hidden="true">
+                    </div>
+                    <div>
+                        <p class="review-name">Мария</p>
+                        <div class="stars" aria-label="5 из 5">
+                            {% for _ in "12345"|make_list %}<img loading="lazy" src="{% static 'core/img/star.svg' %}" alt="">{% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="review-divider"></div>
+                <p class="text">Английский учила ещё в школе, но говорить боялась. После месяца на EngVibe начала строить простые предложения без страха. И всё это в удобном темпе</p>
+            </article>
+            <article class="review-card">
+                <div class="review-head">
+                    <div class="user-avatar-placeholder user-avatar-placeholder--sm" aria-hidden="true">
+                        <img loading="lazy" class="user-avatar-placeholder__icon" src="{% static 'core/img/icon-profil.svg' %}" alt="" aria-hidden="true">
+                    </div>
+                    <div>
+                        <p class="review-name">Мария</p>
+                        <div class="stars" aria-label="5 из 5">
+                            {% for _ in "12345"|make_list %}<img loading="lazy" src="{% static 'core/img/star.svg' %}" alt="">{% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="review-divider"></div>
+                <p class="text">Английский учила ещё в школе, но говорить боялась. После месяца на EngVibe начала строить простые предложения без страха. И всё это в удобном темпе</p>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

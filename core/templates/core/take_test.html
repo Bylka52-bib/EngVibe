@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% block title %}Тест: {{ test.title }} - EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell">
+    <div class="container container--narrow">
+        <form method="post" class="surface-card bento-highlight">
+            <h1>{{ test.title }}</h1>
+            <p class="page-lead">{{ test.description }}</p>
+            {% csrf_token %}
+            {% for question in questions %}
+                <div class="test-question">
+                    <h3>{{ forloop.counter }}. {{ question.text }}</h3>
+                    {% for option in question.options.all %}
+                        <label class="radio-line">
+                            <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}" required>
+                            <span>{{ option.text }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button class="btn btn-primary btn-pill" type="submit">Завершить тест</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

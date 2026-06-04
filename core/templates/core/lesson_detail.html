@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% load static lesson_tags %}
+{% block title %}{{ lesson.title }} - EngVibe{% endblock %}
+{% block body_class %}page-lesson-detail{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'core/css/lesson_content.css' %}">
+<section class="page-shell lesson-page">
+    <div class="container">
+        <article class="surface-card bento-highlight lesson-full-card">
+            <header class="lesson-full-header">
+                <h1 class="lesson-full-title">{{ lesson.title }}</h1>
+                <p class="meta lesson-full-meta">{{ lesson.duration_minutes }} мин.</p>
+            </header>
+            <div class="lesson-full-material">
+                {% if lesson.material %}
+                    <div class="lesson-material-content">{{ lesson.material|lesson_html }}</div>
+                {% else %}
+                    <p class="meta lesson-material-empty">Материал урока пока не добавлен.</p>
+                {% endif %}
+            </div>
+            {% if lesson.video_url %}
+                <div class="lesson-full-media">
+                    <div class="video-wrap">
+                        <iframe src="{{ lesson.video_url }}" title="{{ lesson.title }}" loading="lazy" allowfullscreen></iframe>
+                    </div>
+                </div>
+            {% endif %}
+            {% if lesson.exercise_url %}
+                <p class="lesson-full-exercise"><a class="btn btn-outline-pink btn-pill btn-compact" href="{{ lesson.exercise_url }}" target="_blank" rel="noopener">Открыть упражнение</a></p>
+            {% endif %}
+            <form method="post" class="lesson-full-actions">
+                {% csrf_token %}
+                <button class="btn btn-primary btn-pill" type="submit">Завершить урок</button>
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:course_detail' course.slug %}">Назад к курсу</a>
+            </form>
+        </article>
+    </div>
+</section>
+{% endblock %}

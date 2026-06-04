@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+{% block title %}Тарифы - EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell tariffs-page">
+    <div class="container">
+        <div class="muted-band tariffs-hero">
+            <h1>Подписка EngVibe</h1>
+            <p class="page-lead">Тарифы дают доступ к набору курсам на срок подписки. С активным тарифом можно докупить отдельные курсы в <a href="{% url 'core:courses' %}">каталоге</a>, если их нет в вашем наборе. Без подписки – разовая покупка любого курса в каталоге.</p>
+            {% if active_subscription %}
+                <p class="meta tariffs-active-note">
+                    Сейчас активен тариф «{{ active_subscription.plan.name }}» до {{ active_subscription.expires_at|date:"d.m.Y" }}.
+                    Новый тариф можно оформить после окончания текущего.
+                </p>
+            {% endif %}
+        </div>
+        <div class="card-grid card-grid--3 tariffs-grid">
+            {% for plan in plans %}
+                <article class="surface-card tariff-plan-card bento-highlight {% if plan.slug == 'premium' %}tariff-plan-card--featured{% endif %}">
+                    {% if plan.slug == 'premium' %}
+                        <p class="tariff-featured-ribbon">Популярный</p>
+                    {% elif plan.slug == 'yearly' %}
+                        <p class="tariff-featured-ribbon tariff-featured-ribbon--gold">Выгодно</p>
+                    {% endif %}
+                    <h2 class="tariff-plan-name">{{ plan.name }}</h2>
+                    <p class="tariff-plan-price">{{ plan.price }} <span>₽</span></p>
+                    <p class="tariff-plan-tagline">{{ plan.tagline }}</p>
+                    <ul class="tariff-features">
+                        {% for line in plan.perks.splitlines %}
+                            {% if line.strip %}
+                                <li>{{ line.strip }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    <div class="inline-actions tariff-plan-actions">
+                        {% if active_subscription %}
+                            <span class="btn btn-outline-pink btn-pill btn-compact is-disabled" aria-disabled="true">Уже оформлено</span>
+                        {% else %}
+                            <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:tariff_checkout' plan.slug %}">Оформить</a>
+                        {% endif %}
+                    </div>
+                </article>
+            {% empty %}
+                <article class="surface-card"><p>Тарифы настраиваются в админке.</p></article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

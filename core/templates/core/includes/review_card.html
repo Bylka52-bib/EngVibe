@@ -1,0 +1,27 @@
+{% load static %}
+<article class="review-card{% if wide %} review-card--grid{% endif %}">
+    <div class="review-head">
+        {% if review.author_avatar_url %}
+            <img loading="lazy" class="avatar" src="{{ review.author_avatar_url }}" alt="" width="70" height="70">
+        {% else %}
+            <div class="user-avatar-placeholder user-avatar-placeholder--sm" role="img" aria-label="Аватар: {{ review.name }}">
+                <img loading="lazy" class="user-avatar-placeholder__icon" src="{% static 'core/img/icon-profil.svg' %}" alt="" aria-hidden="true">
+            </div>
+        {% endif %}
+        <div>
+            <p class="review-name">{{ review.name }}</p>
+            <div class="stars" aria-label="Оценка {{ review.rating }} из 5">
+                {% for _ in "12345"|make_list %}
+                    {% if forloop.counter <= review.rating %}
+                        <img loading="lazy" src="{% static 'core/img/star.svg' %}" alt="">
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="review-divider"></div>
+    <p class="text">{{ review.text }}</p>
+    {% if show_date %}
+        <p class="meta review-card__date">{{ review.created_at|date:"d.m.Y" }}</p>
+    {% endif %}
+</article>

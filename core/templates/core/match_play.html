@@ -1,0 +1,184 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ group.level }} – Сопоставь слова{% endblock %}
+{% block body_class %}page-match-play{% endblock %}
+{% block content %}
+<section class="page-shell match-play-page">
+    <div class="container">
+        <div class="match-play-header">
+            <a href="{% url 'core:match_levels' %}" class="meta">← К выбору уровня</a>
+            <h1>{{ group.name }}</h1>
+            <p class="meta match-play-stats">
+                Осталось пар: <strong id="match-remaining">{{ remaining }}</strong> из {{ total_pairs }}
+                · изучено в уровне: {{ progress.learned }}/{{ progress.total }}
+            </p>
+            <div class="match-play-toolbar">
+                <button type="button" class="btn btn-outline-pink btn-pill btn-compact" id="match-shuffle-btn">Сбросить</button>
+                <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:match_levels' %}">Новая игра</a>
+                <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:match_play' group.slug %}?restart=1">Другой набор слов</a>
+            </div>
+        </div>
+
+        <p class="match-play-hint meta">Нажмите слово слева (English), затем перевод справа (Русский).</p>
+
+        <div class="match-board" id="match-board">
+            <div class="match-column match-column--en">
+                <h2 class="match-column__title">English</h2>
+                <ul class="match-card-list" id="match-en-list">
+                    {% for card in en_cards %}
+                        <li>
+                            <button
+                                type="button"
+                                class="match-card{% if card.matched %} is-matched{% endif %}"
+                                data-card-id="{{ card.id }}"
+                                data-side="en"
+                                {% if card.matched %}disabled{% endif %}
+                            >{{ card.word_en }}</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="match-column match-column--ru">
+                <h2 class="match-column__title">Русский</h2>
+                <ul class="match-card-list" id="match-ru-list">
+                    {% for card in ru_cards %}
+                        <li>
+                            <button
+                                type="button"
+                                class="match-card{% if card.matched %} is-matched{% endif %}"
+                                data-card-id="{{ card.id }}"
+                                data-side="ru"
+                                {% if card.matched %}disabled{% endif %}
+                            >{{ card.word_ru }}</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+(function () {
+    var selectedEnId = null;
+    var busy = false;
+    var checkUrl = "{% url 'core:match_check' group.slug %}";
+    var csrfToken = "{{ csrf_token }}";
+    var remainingEl = document.getElementById('match-remaining');
+    var enList = document.getElementById('match-en-list');
+    var ruList = document.getElementById('match-ru-list');
+    var shuffleBtn = document.getElementById('match-shuffle-btn');
+
+    function getCardBtn(side, id) {
+        return document.querySelector(
+            '.match-card[data-side="' + side + '"][data-card-id="' + id + '"]'
+        );
+    }
+
+    function clearSelection() {
+        selectedEnId = null;
+        document.querySelectorAll('.match-card.is-selected').forEach(function (el) {
+            el.classList.remove('is-selected');
+        });
+    }
+
+    function shuffleRuColumn() {
+        var items = Array.prototype.slice.call(ruList.children);
+        for (var i = items.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            ruList.appendChild(items[j]);
+            var tmp = items[i];
+            items[i] = items[j];
+            items[j] = tmp;
+        }
+        clearSelection();
+    }
+
+    function flashWrong(enBtn, ruBtn) {
+        [enBtn, ruBtn].forEach(function (btn) {
+            if (!btn) return;
+            btn.classList.add('is-wrong');
+        });
+        setTimeout(function () {
+            [enBtn, ruBtn].forEach(function (btn) {
+                if (!btn) return;
+                btn.classList.remove('is-wrong');
+            });
+            busy = false;
+            clearSelection();
+        }, 500);
+    }
+
+    function markMatched(cardId) {
+        ['en', 'ru'].forEach(function (side) {
+            var btn = getCardBtn(side, cardId);
+            if (!btn) return;
+            btn.classList.remove('is-selected', 'is-wrong');
+            btn.classList.add('is-correct');
+            setTimeout(function () {
+                btn.classList.add('is-matched');
+                btn.disabled = true;
+            }, 350);
+        });
+    }
+
+    function onEnClick(btn) {
+        if (busy || btn.classList.contains('is-matched')) return;
+        clearSelection();
+        selectedEnId = parseInt(btn.dataset.cardId, 10);
+        btn.classList.add('is-selected');
+    }
+
+    function onRuClick(btn) {
+        if (busy || btn.classList.contains('is-matched')) return;
+        if (selectedEnId === null) return;
+
+        var ruId = parseInt(btn.dataset.cardId, 10);
+        var enBtn = getCardBtn('en', selectedEnId);
+        busy = true;
+
+        fetch(checkUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ en_id: selectedEnId, ru_id: ruId }),
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                    return;
+                }
+                if (data.correct) {
+                    markMatched(data.matched_id);
+                    if (remainingEl && data.remaining !== undefined) {
+                        remainingEl.textContent = data.remaining;
+                    }
+                    busy = false;
+                    clearSelection();
+                } else {
+                    flashWrong(enBtn, btn);
+                }
+            })
+            .catch(function () {
+                busy = false;
+                clearSelection();
+            });
+    }
+
+    enList.addEventListener('click', function (e) {
+        var btn = e.target.closest('.match-card[data-side="en"]');
+        if (btn) onEnClick(btn);
+    });
+
+    ruList.addEventListener('click', function (e) {
+        var btn = e.target.closest('.match-card[data-side="ru"]');
+        if (btn) onRuClick(btn);
+    });
+
+    if (shuffleBtn) {
+        shuffleBtn.addEventListener('click', shuffleRuColumn);
+    }
+})();
+</script>
+{% endblock %}

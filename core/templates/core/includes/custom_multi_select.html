@@ -1,0 +1,47 @@
+<label for="{{ field.id_for_label }}-trigger">{{ field.label }}</label>
+<div
+    class="role-select-wrap role-select-wrap--multi"
+    data-multi-select
+    data-placeholder="{{ placeholder|default:'Выберите курсы' }}"
+>
+    <div class="multi-select-native visually-hidden" aria-hidden="true">
+        {% for checkbox in field %}
+            {{ checkbox.tag }}
+        {% endfor %}
+    </div>
+    <button
+        type="button"
+        class="role-select__trigger"
+        id="{{ field.id_for_label }}-trigger"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+        aria-controls="{{ field.id_for_label }}-listbox"
+    >
+        <span class="role-select__value" data-multi-select-display></span>
+        <span class="role-select__arrow" aria-hidden="true">
+            <svg width="14" height="9" viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L7 7.5L13 1" stroke="#F14D62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </span>
+    </button>
+    <ul
+        class="role-select__list role-select__list--multi"
+        id="{{ field.id_for_label }}-listbox"
+        role="listbox"
+        aria-multiselectable="true"
+        tabindex="-1"
+        hidden
+    >
+        {% for checkbox in field %}
+            <li
+                class="role-select__option"
+                role="option"
+                data-checkbox-id="{{ checkbox.id_for_label }}"
+                data-label="{{ checkbox.choice_label }}"
+                aria-selected="false"
+            >{{ checkbox.choice_label }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+{{ field.errors }}

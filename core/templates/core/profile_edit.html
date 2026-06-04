@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Редактирование профиля - EngVibe{% endblock %}
+{% block body_class %}page-bento-form page-profile-edit{% endblock %}
+{% block content %}
+<section class="page-shell bento-form-page">
+    <div class="container container--narrow">
+        <div class="bento-form-hero muted-band">
+            <h1>Редактировать профиль</h1>
+            <p class="page-lead bento-form-lead">Имя, контакты и коротко о себе – данные отображаются в кабинете.</p>
+        </div>
+        <form method="post" enctype="multipart/form-data" class="bento-form-card surface-card bento-highlight">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                {% include 'core/includes/bento_form_field.html' with field=field only %}
+            {% endfor %}
+
+            <div class="bento-form-actions">
+                <button class="btn btn-primary btn-pill" type="submit">Сохранить</button>
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:profile' %}">Отмена</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% include 'core/includes/bento_form_assets.html' %}
+{% endblock %}

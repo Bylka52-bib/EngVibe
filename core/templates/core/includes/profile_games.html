@@ -1,0 +1,45 @@
+{% load static %}
+<div class="profile-games-section">
+    <h3 class="profile-section__title">Игры</h3>
+    <div class="profile-games-list">
+        <a class="profile-game-card" href="{% url 'core:flashcards_groups' %}">
+            <span class="profile-game-card__icon" aria-hidden="true">
+                <img loading="lazy" src="{% static 'core/img/icon-play1.svg' %}" alt="">
+            </span>
+            <div class="profile-game-card__body">
+                <strong class="profile-game-card__name">Карточки со словами</strong>
+                <p class="meta profile-game-card__desc">Учите слова по уровням CEFR или своим спискам</p>
+            </div>
+            <img loading="lazy" class="profile-game-card__arrow" src="{% static 'core/img/arrow-allcourses.svg' %}" alt="" aria-hidden="true">
+        </a>
+        <a class="profile-game-card" href="{% url 'core:match_levels' %}">
+            <span class="profile-game-card__icon" aria-hidden="true">
+                <img loading="lazy" src="{% static 'core/img/icon-play2.svg' %}" alt="">
+            </span>
+            <div class="profile-game-card__body">
+                <strong class="profile-game-card__name">Сопоставь слова</strong>
+                <p class="meta profile-game-card__desc">
+                    Соединяйте английские слова с переводами
+                    {% if match_stats.words_learned or match_stats.games_completed %}
+                        · изучено {{ match_stats.words_learned }}
+                        {% if match_stats.games_completed %}· игр {{ match_stats.games_completed }}{% endif %}
+                    {% endif %}
+                </p>
+            </div>
+            <img loading="lazy" class="profile-game-card__arrow" src="{% static 'core/img/arrow-allcourses.svg' %}" alt="" aria-hidden="true">
+        </a>
+        <a class="profile-game-card" href="{% url 'core:sentence_builder_levels' %}">
+            <span class="profile-game-card__icon" aria-hidden="true">
+                <img loading="lazy" src="{% static 'core/img/icon-play3.svg' %}" alt="">
+            </span>
+            <div class="profile-game-card__body">
+                <strong class="profile-game-card__name">Составь предложение</strong>
+                <p class="meta profile-game-card__desc">
+                    Собирайте предложения из слов
+                    {% if sentence_stats.total %}· решено {{ sentence_stats.solved }}/{{ sentence_stats.total }}{% endif %}
+                </p>
+            </div>
+            <img loading="lazy" class="profile-game-card__arrow" src="{% static 'core/img/arrow-allcourses.svg' %}" alt="" aria-hidden="true">
+        </a>
+    </div>
+</div>

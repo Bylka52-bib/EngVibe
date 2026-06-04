@@ -1,0 +1,112 @@
+{% extends 'core/base.html' %}
+{% load static role_tags %}
+{% block title %}Админ-панель - EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell">
+    <div class="container">
+        <h1>Админ-панель</h1>
+        <div class="tab-links">
+            <a href="?tab=courses" class="{% if tab == 'courses' %}is-active{% endif %}">Курсы</a>
+            <a href="?tab=lessons" class="{% if tab == 'lessons' %}is-active{% endif %}">Уроки</a>
+            <a href="?tab=tests" class="{% if tab == 'tests' %}is-active{% endif %}">Тесты</a>
+            <a href="?tab=reviews" class="{% if tab == 'reviews' %}is-active{% endif %}">Отзывы</a>
+            <a href="?tab=users" class="{% if tab == 'users' %}is-active{% endif %}">Пользователи</a>
+            <a href="?tab=course_groups" class="{% if tab == 'course_groups' %}is-active{% endif %}">Группы курсов</a>
+        </div>
+        {% if tab == 'courses' %}
+            <div class="inline-actions"><a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:course_create' %}">Добавить курс</a></div>
+            <div class="admin-list">
+                {% for course in courses %}
+                    <article class="surface-card">
+                        <h3>{{ course.title }}</h3>
+                        <p>{{ course.short_description }}</p>
+                        <div class="inline-actions">
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:course_update' course.slug %}">Редактировать</a>
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:course_delete' course.slug %}">Удалить</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% elif tab == 'lessons' %}
+            <div class="inline-actions"><a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:lesson_create' %}">Добавить урок</a></div>
+            <div class="admin-list">
+                {% for lesson in lessons %}
+                    <article class="surface-card panel-entity-card">
+                        <h3>{{ lesson.course.title }}: {{ lesson.title }}</h3>
+                        <p class="meta">Порядок: {{ lesson.order }} · {{ lesson.duration_minutes }} мин.</p>
+                        <div class="inline-actions">
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:lesson_update' lesson.id %}">Редактировать</a>
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:lesson_delete' lesson.id %}">Удалить</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% elif tab == 'tests' %}
+            <div class="inline-actions">
+                <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:test_create' %}">Создать тест с вопросами</a>
+            </div>
+            <div class="admin-list">
+                {% for test in tests %}
+                    <article class="surface-card panel-entity-card">
+                        <h3>{{ test.course.title }}: {{ test.title }}</h3>
+                        <p class="meta">Вопросов: {{ test.questions_count }}</p>
+                        <div class="inline-actions">
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:test_update' test.id %}">Редактировать</a>
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:test_delete' test.id %}">Удалить</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% elif tab == 'reviews' %}
+            <div class="admin-list">
+                {% for review in reviews %}
+                    <article class="surface-card"><h3>{{ review.name }}</h3><p>{{ review.text }}</p><p class="meta">Опубликован: {{ review.is_published }}</p></article>
+                {% endfor %}
+            </div>
+        {% elif tab == 'course_groups' %}
+            <div class="inline-actions" style="flex-wrap: wrap; gap: 12px; align-items: center;">
+                <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:course_group_create' %}">Создать группу</a>
+                <form method="get" class="admin-filter-form" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <input type="hidden" name="tab" value="course_groups">
+                    <label class="meta admin-filter-form__label" for="author-filter-trigger">Автор:</label>
+                    {% include 'core/includes/custom_select.html' with field_name='author' field_id='author-filter' trigger_id='author-filter-trigger' wrap_class='admin-filter-form__select' current_value=author_filter options=author_filter_options only %}
+                    <button type="submit" class="btn btn-outline-pink btn-pill btn-compact">Фильтр</button>
+                </form>
+            </div>
+            <div class="admin-list">
+                {% for group in course_groups %}
+                    <article class="surface-card panel-entity-card">
+                        <h3>{{ group.name }}</h3>
+                        <p class="meta">
+                            Тариф: {{ group.tariff_plan.name }}
+                            · курсов: {{ group.course_count }}
+                            {% if group.created_by %}· автор: {{ group.created_by.username }}{% endif %}
+                        </p>
+                        {% if group.description %}<p>{{ group.description|truncatewords:30 }}</p>{% endif %}
+                        <div class="inline-actions">
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:course_group_update' group.slug %}">Редактировать</a>
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:course_group_delete' group.slug %}">Удалить</a>
+                        </div>
+                    </article>
+                {% empty %}
+                    <article class="surface-card"><p class="meta">Групп пока нет. Создайте первую группу для тарифа.</p></article>
+                {% endfor %}
+            </div>
+        {% elif tab == 'users' %}
+            <div class="admin-list">
+                {% for item in users %}
+                    <article class="surface-card">
+                        <h3>{{ item.username }}</h3>
+                        <p>{{ item.email }}</p>
+                        <p class="meta">Роль: {{ item|user_role }}</p>
+                        <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:user_role_update' item.id %}">Сменить роль</a>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% if tab == 'course_groups' %}
+{% include 'core/includes/bento_form_assets.html' %}
+{% endif %}
+{% endblock %}

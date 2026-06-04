@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ title }} – EngVibe{% endblock %}
+
+{% block body_class %}page-bento-form{% endblock %}
+
+{% block content %}
+
+<section class="page-shell bento-form-page">
+
+    <div class="container container--narrow">
+
+        <div class="flashcards-page-toolbar">
+            <a class="flashcards-page-back meta" href="{% url 'core:flashcards_groups' %}">← К группам</a>
+        </div>
+
+        <div class="bento-form-hero muted-band">
+
+            <h1>{{ title }}</h1>
+
+            <p class="page-lead bento-form-lead">Придумайте название — после создания добавите слова и переводы.</p>
+
+        </div>
+
+        <form method="post" class="bento-form-card surface-card bento-highlight">
+
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+
+                {% include 'core/includes/bento_form_field.html' with field=field only %}
+
+            {% endfor %}
+
+            <div class="bento-form-actions">
+
+                <button type="submit" class="btn btn-primary btn-pill">Создать</button>
+
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:flashcards_groups' %}">Отмена</a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

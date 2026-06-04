@@ -1,0 +1,61 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Выбор курсов – EngVibe{% endblock %}
+{% block body_class %}page-bento-form page-pick-courses{% endblock %}
+{% block content %}
+<section class="page-shell bento-form-page">
+    <div class="container">
+        <div class="bento-form-hero muted-band">
+            <h1>Выберите до {{ max_n }} курсов</h1>
+            <p class="page-lead">Отметьте курсы, к которым хотите получить доступ по текущей подписке. Потом можно изменить выбор до истечения срока (через поддержку или повторное оформление).</p>
+        </div>
+        <form method="post" class="pick-courses-form">
+            {% csrf_token %}
+            <div class="courses-grid courses-grid--pick">
+                {% for course in catalog %}
+                    {% cycle 'core/img/course-1.jpg' 'core/img/course-2.jpg' 'core/img/course-3.jpg' 'core/img/course-4.jpg' as default_course_img silent %}
+                    <label class="course-card pick-select-card pick-course-card{% if course.pk in picked_ids %} is-picked{% endif %}">
+                        <input type="checkbox" name="course_ids" value="{{ course.pk }}" class="pick-select-input pick-course-input"
+                            {% if course.pk in picked_ids %}checked{% endif %}>
+                        <span class="pick-select-check" aria-hidden="true"><span class="pick-select-check__icon"></span></span>
+                        <div class="course-card__img">
+                            {% if course.thumbnail %}
+                                <img loading="lazy" src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+                            {% else %}
+                                <img loading="lazy" src="{% static default_course_img %}" alt="{{ course.title }}">
+                            {% endif %}
+                        </div>
+                        <div>
+                            <p class="course-card__level">{{ course.level }}</p>
+                            <p class="course-card__title">{{ course.title }}</p>
+                            <p class="course-card__desc">{{ course.short_description }}</p>
+                        </div>
+                    </label>
+                {% empty %}
+                    <p>Нет опубликованных курсов.</p>
+                {% endfor %}
+            </div>
+            <div class="bento-form-actions pick-courses-actions">
+                <button type="submit" class="btn btn-primary btn-pill">Сохранить выбор</button>
+            </div>
+        </form>
+    </div>
+</section>
+<script src="{% static 'core/js/pick_selection.js' %}"></script>
+<script>
+(function () {
+    var max = {{ max_n }};
+    var form = document.querySelector('.pick-courses-form');
+    if (!form) return;
+    form.addEventListener('change', function () {
+        var boxes = form.querySelectorAll('input[name="course_ids"]:checked');
+        if (boxes.length > max) {
+            var last = boxes[boxes.length - 1];
+            last.checked = false;
+            last.dispatchEvent(new Event('change', { bubbles: true }));
+            alert('Можно выбрать не более ' + max + ' курсов.');
+        }
+    });
+})();
+</script>
+{% endblock %}

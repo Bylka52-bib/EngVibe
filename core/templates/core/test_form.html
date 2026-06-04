@@ -1,0 +1,128 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ title }} - EngVibe{% endblock %}
+{% block body_class %}page-bento-form{% endblock %}
+{% block content %}
+<section class="page-shell bento-form-page">
+    <div class="container container--narrow">
+        <div class="bento-form-hero muted-band muted-band--yellow">
+            <h1>{{ title }}</h1>
+            <p class="page-lead bento-form-lead">Укажите курс и название теста. Ниже – блок вопроса с вариантами ответов; при необходимости нажмите «Добавить вопрос».</p>
+        </div>
+
+        <form method="post" class="test-compose-form" id="test-compose-form" novalidate>
+            {% csrf_token %}
+
+            <div class="bento-form-card surface-card bento-highlight bento-form-card--wide test-compose-meta">
+                <h2 class="test-compose-section-title">Параметры теста</h2>
+                {{ test_form.non_field_errors }}
+                {% for field in test_form %}
+                    {% include 'core/includes/bento_form_field.html' with field=field only %}
+                {% endfor %}
+            </div>
+
+            <div class="test-compose-questions">
+                <h2 class="test-compose-section-title">Вопросы и ответы</h2>
+                {{ question_formset.non_field_errors }}
+                {{ question_formset.management_form }}
+
+                <div class="test-compose-question-list" id="question-formset-list">
+                    {% for qform in question_formset %}
+                        <div class="test-compose-question surface-card bento-highlight">
+                            <p class="test-compose-qnum">Вопрос {{ forloop.counter }}</p>
+                            {% for field in qform %}
+                                {% if field.name == 'correct_choice' %}
+                                    <div class="test-compose-field test-compose-field--radios">
+                                        <span class="test-compose-label">{{ field.label }}</span>
+                                        {{ field }}
+                                        {{ field.errors }}
+                                    </div>
+                                {% else %}
+                                    {% include 'core/includes/bento_form_field.html' with field=field only %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if qform.non_field_errors %}
+                                {{ qform.non_field_errors }}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="test-compose-add-wrap">
+                    <button type="button" class="btn btn-outline-pink btn-pill btn-compact" id="add-question-btn">Добавить вопрос</button>
+                    <p class="test-compose-add-hint">Можно добавить до {{ question_formset.max_num }} вопросов за один раз.</p>
+                </div>
+            </div>
+
+            <div class="bento-form-actions test-compose-actions">
+                <button class="btn btn-primary btn-pill" type="submit">Сохранить тест</button>
+                <a class="btn btn-outline-pink btn-pill" href="{{ form_cancel_url }}">Отмена</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<template id="question-empty-template">
+    <div class="test-compose-question surface-card bento-highlight">
+        <p class="test-compose-qnum">Вопрос</p>
+        {% for field in question_formset.empty_form %}
+            {% if field.name == 'correct_choice' %}
+                <div class="test-compose-field test-compose-field--radios">
+                    <span class="test-compose-label">{{ field.label }}</span>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% else %}
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+                {{ field.errors }}
+            {% endif %}
+        {% endfor %}
+    </div>
+</template>
+
+<script>
+(function () {
+    var list = document.getElementById('question-formset-list');
+    var addBtn = document.getElementById('add-question-btn');
+    var tpl = document.getElementById('question-empty-template');
+    var totalInput = document.querySelector('#test-compose-form input[name$="TOTAL_FORMS"]');
+    var maxInput = document.querySelector('#test-compose-form input[name$="MAX_NUM_FORMS"]');
+    if (!list || !addBtn || !tpl || !totalInput) return;
+
+    function getPrefix() {
+        var name = totalInput.getAttribute('name') || '';
+        var idx = name.indexOf('-TOTAL_FORMS');
+        return idx === -1 ? 'form' : name.slice(0, idx);
+    }
+
+    function renumberQuestions() {
+        var blocks = list.querySelectorAll('.test-compose-question');
+        blocks.forEach(function (el, i) {
+            var label = el.querySelector('.test-compose-qnum');
+            if (label) label.textContent = 'Вопрос ' + (i + 1);
+        });
+    }
+
+    addBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var count = parseInt(totalInput.value, 10) || 0;
+        var max = maxInput ? parseInt(maxInput.value, 10) : 100;
+        if (count >= max) return;
+
+        var prefix = getPrefix();
+        var html = tpl.innerHTML.replace(/__prefix__/g, String(count));
+        var wrap = document.createElement('div');
+        wrap.innerHTML = html.trim();
+        var node = wrap.firstElementChild;
+        if (node) list.appendChild(node);
+
+        totalInput.value = String(count + 1);
+        renumberQuestions();
+    });
+
+    renumberQuestions();
+})();
+</script>
+{% include 'core/includes/bento_form_assets.html' %}
+{% endblock %}

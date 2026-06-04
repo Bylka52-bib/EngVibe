@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{% block title %}Результат – {{ level_label }}{% endblock %}
+{% block content %}
+<section class="page-shell">
+    <div class="container container--narrow">
+        <div class="surface-card flashcards-result-card">
+            <h1>Сессия завершена</h1>
+            <p class="meta">{{ level_label }}</p>
+
+            <div class="flashcards-result-stats">
+                <div>
+                    <strong>{{ session.correct_count|default:0 }}</strong>
+                    <span class="meta">верных в сессии</span>
+                </div>
+                <div>
+                    <strong>{{ session.attempts|default:0 }}</strong>
+                    <span class="meta">попыток проверки</span>
+                </div>
+            </div>
+
+            <p style="margin: 20px 0;">
+                Решено на уровне: <strong>{{ progress.solved }}</strong> из <strong>{{ progress.total }}</strong>
+            </p>
+            <div class="progress-line" style="margin-bottom: 24px;"><span style="width: {{ progress.percent }}%;"></span></div>
+
+            {% if all_solved %}
+                <p>Вы решили все задания этого уровня.</p>
+            {% endif %}
+
+            <div class="inline-actions" style="margin-top: 24px; justify-content: center;">
+                {% if progress.total %}
+                    <a class="btn btn-primary btn-pill" href="{% url 'core:sentence_builder_play' level %}?restart=all" data-confirm-restart>Начать заново</a>
+                {% endif %}
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:sentence_builder_levels' %}">К уровням</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% include 'core/includes/flashcards_confirm.html' %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+{% block title %}Сопоставь слова – EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell match-levels-page">
+    <div class="container">
+        <div class="flashcards-page-toolbar">
+            <a class="flashcards-page-back meta" href="{% url 'core:profile' %}">← В профиль</a>
+        </div>
+        <div class="page-head" style="margin-bottom: 28px;">
+            <h1>Сопоставь слова</h1>
+            <p class="meta">Выберите уровень. Соедините английское слово с правильным переводом: нажмите слева, затем справа.</p>
+            {% if stats.words_learned or stats.games_completed %}
+                <p class="meta match-global-stats">
+                    Изучено слов: <strong>{{ stats.words_learned }}</strong>
+                    · завершено игр: <strong>{{ stats.games_completed }}</strong>
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="card-grid card-grid--3 match-level-grid">
+            {% for row in levels %}
+                <div class="surface-card match-level-card">
+                    <span class="flashcards-level-badge">{{ row.group.level }}</span>
+                    <h3 style="margin: 8px 0;">{{ row.group.name }}</h3>
+                    {% if row.group.card_count >= 4 %}
+                        <p class="meta">В игре изучено: {{ row.progress.learned }} / {{ row.progress.total }}</p>
+                        <div class="progress-line" style="margin: 12px 0;"><span style="width: {{ row.progress.percent }}%;"></span></div>
+                        {% if row.games_completed %}
+                            <p class="meta">Игр завершено: {{ row.games_completed }}</p>
+                        {% endif %}
+                        <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:match_play' row.group.slug %}">Играть</a>
+                    {% else %}
+                        <p class="meta" style="margin: 0;">Нужно минимум 4 слова в группе</p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p class="meta">Уровни ещё не настроены.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

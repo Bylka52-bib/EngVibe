@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+{% block title %}Карточки со словами – EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell flashcards-groups-page">
+    <div class="container">
+        <div class="flashcards-page-toolbar">
+            <a class="flashcards-page-back meta" href="{% url 'core:profile' %}">← В профиль</a>
+        </div>
+        <div class="page-head flashcards-page-head">
+            <h1>Карточки со словами</h1>
+            <p class="meta">Выберите уровень или свою группу. Нажмите на карточку, чтобы увидеть перевод, затем отметьте «Знаю» или «Не знаю».</p>
+        </div>
+
+        <h2 class="flashcards-section-title flashcards-section-title--first">Уровни CEFR</h2>
+        <div class="card-grid card-grid--3 flashcards-group-grid">
+            {% for row in default_groups %}
+                <div class="surface-card flashcards-group-card">
+                    <span class="flashcards-level-badge">{{ row.group.level }}</span>
+                    <h3 style="margin: 8px 0;">{{ row.group.name }}</h3>
+                    {% if row.group.card_count %}
+                        <p class="meta">Выучено: {{ row.progress.learned }} / {{ row.progress.total }}</p>
+                        <div class="progress-line" style="margin: 12px 0;"><span style="width: {{ row.progress.percent }}%;"></span></div>
+                        <div class="flashcards-group-card__actions">
+                            {% if row.progress.active %}
+                                <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:flashcards_play' row.group.slug %}">Учить</a>
+                            {% endif %}
+                            {% if row.progress.learned %}
+                                <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:flashcards_play' row.group.slug %}?restart=all" data-confirm-restart>Начать заново</a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="meta" style="margin: 0;">Карточки скоро появятся</p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p class="meta">Стандартные группы ещё не настроены.</p>
+            {% endfor %}
+        </div>
+
+        <div class="flashcards-section-head">
+            <h2 class="flashcards-section-title">Мои группы</h2>
+            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:flashcards_group_create' %}">+ Создать группу</a>
+        </div>
+        {% if user_groups %}
+            <div class="card-grid card-grid--2 flashcards-group-grid">
+                {% for row in user_groups %}
+                    <div class="surface-card flashcards-group-card">
+                        <h3 style="margin: 0 0 8px;">{{ row.group.name }}</h3>
+                        {% if row.group.card_count %}
+                            <p class="meta">Выучено: {{ row.progress.learned }} / {{ row.progress.total }}</p>
+                            <div class="progress-line" style="margin: 12px 0;"><span style="width: {{ row.progress.percent }}%;"></span></div>
+                            <div class="flashcards-group-card__actions">
+                                {% if row.progress.active %}
+                                    <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:flashcards_play' row.group.slug %}">Учить</a>
+                                {% endif %}
+                                {% if row.progress.learned %}
+                                    <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:flashcards_play' row.group.slug %}?restart=all" data-confirm-restart>Начать заново</a>
+                                {% endif %}
+                                <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:flashcards_group_manage' row.group.slug %}">Редактировать</a>
+                            </div>
+                        {% else %}
+                            <div class="flashcards-group-card__actions">
+                                <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:flashcards_group_manage' row.group.slug %}">Редактировать</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="meta" style="margin-top: 12px;">У вас пока нет личных групп. Создайте свою колоду слов.</p>
+        {% endif %}
+
+    </div>
+</section>
+{% include 'core/includes/flashcards_confirm.html' %}
+{% endblock %}

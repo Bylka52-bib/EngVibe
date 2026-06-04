@@ -1,0 +1,295 @@
+/* Стили материала урока (редактор TinyMCE + страница просмотра) */
+
+.lesson-material-content {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text, #191a23);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.lesson-material-content::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.lesson-material-content > *:first-child {
+  margin-top: 0;
+}
+
+.lesson-material-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.lesson-material-content h1,
+.lesson-material-content h2,
+.lesson-material-content h3,
+.lesson-material-content h4 {
+  font-family: var(--font-display, "Nunito", sans-serif);
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 1.4em 0 0.6em;
+  color: var(--pink-deep, #f04769);
+  clear: both;
+}
+
+.lesson-material-content h2 { font-size: clamp(1.35rem, 3vw, 1.75rem); }
+.lesson-material-content h3 { font-size: clamp(1.15rem, 2.5vw, 1.4rem); }
+.lesson-material-content h4 { font-size: 1.1rem; }
+
+.lesson-material-content p {
+  margin: 0 0 14px;
+}
+
+.lesson-material-content ul,
+.lesson-material-content ol {
+  margin: 0 0 16px;
+  padding-left: 1.4em;
+}
+
+.lesson-material-content li {
+  margin-bottom: 6px;
+}
+
+.lesson-material-content a {
+  color: var(--pink-deep, #f04769);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Изображения: выравнивание и обтекание */
+.lesson-material-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 16px;
+}
+
+.lesson-material-content img.lesson-align-left {
+  float: left;
+  max-width: min(46%, 400px);
+  margin: 6px 24px 16px 0;
+}
+
+.lesson-material-content img.lesson-align-right {
+  float: right;
+  max-width: min(46%, 400px);
+  margin: 6px 0 16px 24px;
+}
+
+.lesson-material-content img.lesson-align-center {
+  display: block;
+  float: none;
+  clear: both;
+  margin: 20px auto;
+}
+
+.lesson-material-content img:not([class]) {
+  display: block;
+  margin: 20px auto;
+}
+
+/* Блок: текст + медиа в две колонки */
+.lesson-material-content .lesson-media-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+  margin: 24px 0;
+  clear: both;
+}
+
+.lesson-material-content .lesson-media-row--img-right {
+  flex-direction: row;
+}
+
+.lesson-material-content .lesson-media-row--img-left {
+  flex-direction: row-reverse;
+}
+
+.lesson-material-content .lesson-media-row__body {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.lesson-material-content .lesson-media-row__body > *:first-child {
+  margin-top: 0;
+}
+
+.lesson-material-content .lesson-media-row__media {
+  flex: 0 1 42%;
+  min-width: 200px;
+  max-width: 100%;
+}
+
+.lesson-material-content .lesson-media-row__media img {
+  display: block;
+  width: 100%;
+  margin: 0;
+  float: none;
+}
+
+.lesson-material-content .lesson-media-row__media .lesson-table-scroll {
+  margin: 0;
+}
+
+.lesson-material-content .lesson-table-float-right,
+.lesson-material-content .lesson-table-float-left {
+  float: none;
+  max-width: 100%;
+}
+
+/* Таблицы */
+.lesson-material-content .lesson-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 16px 0 20px;
+  clear: both;
+}
+
+.lesson-material-content .lesson-media-row__media .lesson-table-scroll {
+  overflow-x: auto;
+}
+
+.lesson-material-content table {
+  width: 100%;
+  min-width: 200px;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.lesson-material-content th,
+.lesson-material-content td {
+  border: 1px solid rgba(25, 26, 35, 0.14);
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.lesson-material-content th:not([style*="background"]):not([bgcolor]) {
+  background: var(--pink-soft, #ffe7ea);
+  font-weight: 600;
+}
+
+.lesson-material-content tr:nth-child(even) td:not([style*="background"]):not([bgcolor]) {
+  background: rgba(255, 231, 234, 0.22);
+}
+
+.lesson-material-content .lesson-video-wrap {
+  position: relative;
+  width: 100%;
+  margin: 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #111;
+  aspect-ratio: 16 / 9;
+  clear: both;
+}
+
+.lesson-material-content .lesson-video-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.lesson-material-content .lesson-callout {
+  margin: 20px 0;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border-left: 4px solid var(--pink, #f14d62);
+  background: var(--yellow-panel, #fceec0);
+  clear: both;
+}
+
+.lesson-material-content .lesson-callout p:last-child {
+  margin-bottom: 0;
+}
+
+.lesson-material-content .lesson-btn-wrap {
+  margin: 20px 0;
+  text-align: center;
+  clear: both;
+}
+
+.lesson-material-content a.lesson-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 999px;
+  background: var(--pink, #f14d62);
+  color: #fafafa !important;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.lesson-material-content a.lesson-btn:hover {
+  background: var(--pink-deep, #f04769);
+  transform: translateY(-1px);
+}
+
+.lesson-material-content blockquote {
+  margin: 16px 0;
+  padding: 12px 18px;
+  border-left: 3px solid var(--pink-soft, #ffe7ea);
+  background: rgba(255, 231, 234, 0.35);
+  border-radius: 0 12px 12px 0;
+  clear: both;
+}
+
+.lesson-material-content pre,
+.lesson-material-content code {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.92em;
+}
+
+.lesson-material-content pre {
+  overflow-x: auto;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(25, 26, 35, 0.06);
+  clear: both;
+}
+
+@media (max-width: 768px) {
+  .lesson-material-content {
+    font-size: 16px;
+  }
+
+  .lesson-material-content img.lesson-align-left,
+  .lesson-material-content img.lesson-align-right {
+    float: none;
+    display: block;
+    max-width: 100%;
+    margin: 16px auto;
+  }
+
+  .lesson-material-content .lesson-media-row,
+  .lesson-material-content .lesson-media-row--img-right,
+  .lesson-material-content .lesson-media-row--img-left {
+    flex-direction: column;
+  }
+
+  .lesson-material-content .lesson-media-row__media {
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .lesson-material-content table {
+    font-size: 14px;
+  }
+
+  .lesson-material-content th,
+  .lesson-material-content td {
+    padding: 8px 10px;
+  }
+
+  .lesson-material-content a.lesson-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}

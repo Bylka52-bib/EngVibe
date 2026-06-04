@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Социальные сети – EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell">
+    <div class="container container--narrow">
+        <div class="muted-band social-soon-band">
+            <h1>Социальные сети</h1>
+            <p class="page-lead">Скоро появятся наши соцсети — следите за новостями на платформе и в рассылке.</p>
+            <a class="btn btn-primary btn-pill" href="{% url 'core:home' %}">На главную</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

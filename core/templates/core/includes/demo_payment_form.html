@@ -1,0 +1,27 @@
+<div class="checkout-payment-block">
+    <h2 class="checkout-payment-block__title">Данные карты</h2>
+    <p class="meta checkout-payment-note">Демо-режим: данные не сохраняются и не передаются в банк. Позже подключим платёжный шлюз.</p>
+    {{ payment_form.non_field_errors }}
+    <div class="checkout-payment-grid">
+        <div class="checkout-payment-field checkout-payment-field--wide">
+            <label for="{{ payment_form.card_number.id_for_label }}">{{ payment_form.card_number.label }}</label>
+            {{ payment_form.card_number }}
+            {{ payment_form.card_number.errors }}
+        </div>
+        <div class="checkout-payment-field">
+            <label for="{{ payment_form.card_expiry.id_for_label }}">{{ payment_form.card_expiry.label }}</label>
+            {{ payment_form.card_expiry }}
+            {{ payment_form.card_expiry.errors }}
+        </div>
+        <div class="checkout-payment-field">
+            <label for="{{ payment_form.card_cvv.id_for_label }}">{{ payment_form.card_cvv.label }}</label>
+            {{ payment_form.card_cvv }}
+            {{ payment_form.card_cvv.errors }}
+        </div>
+    </div>
+    <div class="bento-form-check checkout-confirm-check">
+        {{ payment_form.confirm_purchase }}
+        <label for="{{ payment_form.confirm_purchase.id_for_label }}">{{ payment_form.confirm_purchase.label }}</label>
+    </div>
+    {{ payment_form.confirm_purchase.errors }}
+</div>

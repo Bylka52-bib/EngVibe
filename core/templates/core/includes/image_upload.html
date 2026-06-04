@@ -1,0 +1,27 @@
+{% with instance=field.form.instance %}
+<div
+    class="image-upload image-upload--{{ variant|default:'square' }}"
+    data-image-upload
+    data-preview-variant="{{ variant|default:'square' }}"
+>
+    <span class="image-upload__label">{{ field.label }}</span>
+    <div class="image-upload__row">
+        <div class="image-upload__preview" data-image-preview>
+            {% if field.name == 'avatar' and instance.avatar %}
+                <img loading="lazy" class="image-upload__img" src="{{ instance.avatar.url }}" alt="" data-image-preview-img>
+            {% elif field.name == 'thumbnail' and instance.thumbnail %}
+                <img loading="lazy" class="image-upload__img" src="{{ instance.thumbnail.url }}" alt="" data-image-preview-img>
+            {% elif field.value and field.value.url %}
+                <img loading="lazy" class="image-upload__img" src="{{ field.value.url }}" alt="" data-image-preview-img>
+            {% else %}
+                <img class="image-upload__img" alt="" data-image-preview-img hidden>
+            {% endif %}
+        </div>
+        <label class="btn btn-primary btn-pill image-upload__btn" for="{{ field.id_for_label }}">
+            {{ button_text|default:'Загрузить фото' }}
+        </label>
+    </div>
+    {{ field }}
+    {{ field.errors }}
+</div>
+{% endwith %}

@@ -1,0 +1,93 @@
+<div class="fc-confirm-overlay" id="fc-confirm-overlay" hidden>
+    <div class="fc-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="fc-confirm-title">
+        <h3 id="fc-confirm-title">Подтвердите действие</h3>
+        <p class="meta" id="fc-confirm-text"></p>
+        <div class="fc-confirm-actions">
+            <button type="button" class="btn btn-outline-pink btn-pill" id="fc-confirm-cancel">Отмена</button>
+            <button type="button" class="btn btn-primary btn-pill" id="fc-confirm-ok">Подтвердить</button>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    var overlay = document.getElementById('fc-confirm-overlay');
+    var okBtn = document.getElementById('fc-confirm-ok');
+    var cancelBtn = document.getElementById('fc-confirm-cancel');
+    var titleEl = document.getElementById('fc-confirm-title');
+    var textEl = document.getElementById('fc-confirm-text');
+    if (!overlay || !okBtn || !cancelBtn || !titleEl || !textEl) return;
+
+    var pendingUrl = '';
+    var pendingForm = null;
+    var okHandler = null;
+
+    function setOkHandler(fn) {
+        if (okHandler) {
+            okBtn.removeEventListener('click', okHandler);
+        }
+        okHandler = fn;
+        if (okHandler) {
+            okBtn.addEventListener('click', okHandler);
+        }
+    }
+
+    function openConfirm(opts) {
+        titleEl.textContent = opts.title || 'Подтвердите действие';
+        textEl.textContent = opts.text || '';
+        overlay.hidden = false;
+        document.body.classList.add('fc-confirm-open');
+        cancelBtn.focus();
+        setOkHandler(opts.onOk || function () {});
+    }
+
+    function closeConfirm() {
+        overlay.hidden = true;
+        document.body.classList.remove('fc-confirm-open');
+        pendingUrl = '';
+        pendingForm = null;
+        setOkHandler(null);
+    }
+
+    document.querySelectorAll('[data-confirm-restart]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+            e.preventDefault();
+            openConfirm({
+                title: 'Начать группу заново?',
+                text: 'Прогресс по этой группе будет сброшен. Все карточки снова попадут в обучение.',
+                onOk: function () {
+                    window.location.href = el.getAttribute('href');
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll('form[data-fc-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            if (form.dataset.fcConfirmed === '1') {
+                delete form.dataset.fcConfirmed;
+                return;
+            }
+            e.preventDefault();
+            pendingForm = form;
+            openConfirm({
+                title: form.getAttribute('data-fc-confirm-title') || 'Подтвердите действие',
+                text: form.getAttribute('data-fc-confirm-text') || '',
+                onOk: function () {
+                    if (pendingForm) {
+                        pendingForm.dataset.fcConfirmed = '1';
+                        pendingForm.submit();
+                    }
+                }
+            });
+        });
+    });
+
+    cancelBtn.addEventListener('click', closeConfirm);
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeConfirm();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (!overlay.hidden && e.key === 'Escape') closeConfirm();
+    });
+})();
+</script>

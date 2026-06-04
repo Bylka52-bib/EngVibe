@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% block title %}Результат – {{ group.name }}{% endblock %}
+{% block content %}
+<section class="page-shell">
+    <div class="container container--narrow">
+        <div class="surface-card flashcards-result-card">
+            <h1>Сессия завершена</h1>
+            <p class="meta">{{ group.name }}</p>
+
+            <div class="flashcards-result-stats">
+                <div>
+                    <strong>{{ session.reviewed|default:0 }}</strong>
+                    <span class="meta">карточек в сессии</span>
+                </div>
+                <div>
+                    <strong>{{ session.known_count|default:0 }}</strong>
+                    <span class="meta">отмечено «Знаю»</span>
+                </div>
+                <div>
+                    <strong>{{ session.unknown_count|default:0 }}</strong>
+                    <span class="meta">отмечено «Не знаю»</span>
+                </div>
+            </div>
+
+            {% if all_learned %}
+                <p>Вы прошли все карточки в этой группе. Можете начать заново и повторить весь набор.</p>
+            {% endif %}
+
+            <div class="inline-actions" style="margin-top: 24px; justify-content: center;">
+                {% if can_restart_all %}
+                    <a class="btn btn-primary btn-pill" href="{% url 'core:flashcards_play' group.slug %}?restart=all" data-confirm-restart>Начать заново</a>
+                {% endif %}
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:flashcards_groups' %}">К группам</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% include 'core/includes/flashcards_confirm.html' %}
+{% endblock %}

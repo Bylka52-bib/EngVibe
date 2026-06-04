@@ -1,0 +1,10 @@
+{% load static %}
+<div class="star-rating" role="radiogroup" aria-label="Оценка от 1 до 5">
+{% for i in widget.stars %}
+    <label class="star-rating__star{% if widget.value >= i %} is-active{% endif %}">
+        <input type="radio" name="{{ widget.name }}" value="{{ i }}"{% if widget.value == i %} checked{% endif %}>
+        <img loading="lazy" src="{% static 'core/img/star.svg' %}" alt="" width="30" height="30">
+        <span class="visually-hidden">{{ i }} из 5</span>
+    </label>
+{% endfor %}
+</div>

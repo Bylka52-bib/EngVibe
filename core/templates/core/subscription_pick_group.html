@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Выбор группы курсов – EngVibe{% endblock %}
+{% block body_class %}page-bento-form page-pick-group{% endblock %}
+{% block content %}
+<section class="page-shell bento-form-page">
+    <div class="container">
+        <div class="bento-form-hero muted-band">
+            <h1>Выберите группу курсов</h1>
+            <p class="page-lead">После выбора откроется доступ ко всем курсам в группе. Группы формируют преподаватели и администраторы.</p>
+        </div>
+        <form method="post" class="pick-group-form">
+            {% csrf_token %}
+            <div class="courses-grid courses-grid--pick">
+                {% for group in groups %}
+                    <label class="course-card pick-select-card pick-group-card{% if group.pk == picked_group_id %} is-picked{% endif %}">
+                        <input
+                            type="radio"
+                            name="group_id"
+                            value="{{ group.pk }}"
+                            class="pick-select-input pick-group-input"
+                            {% if group.pk == picked_group_id %}checked{% endif %}
+                            required
+                        >
+                        <span class="pick-select-check" aria-hidden="true"><span class="pick-select-check__icon"></span></span>
+                        <div class="pick-group-card__body">
+                            <p class="course-card__level">{{ group.name }}</p>
+                            {% if group.description %}
+                                <p class="course-card__desc">{{ group.description }}</p>
+                            {% endif %}
+                            <p class="pick-group-card__count">Курсов в группе: {{ group.course_count }}</p>
+                        </div>
+                    </label>
+                {% empty %}
+                    <p class="meta">Для этого тарифа пока нет групп.</p>
+                {% endfor %}
+            </div>
+            <div class="bento-form-actions pick-courses-actions">
+                <button type="submit" class="btn btn-primary btn-pill">Подтвердить выбор</button>
+            </div>
+        </form>
+    </div>
+</section>
+<script src="{% static 'core/js/pick_selection.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+{% block title %}Результат – Сопоставь слова{% endblock %}
+{% block content %}
+<section class="page-shell">
+    <div class="container container--narrow">
+        <div class="surface-card flashcards-result-card match-result-card">
+            <p class="chip">Уровень {{ group.level }}</p>
+            <h1>Раунд завершён!</h1>
+            <div class="flashcards-result-stats">
+                <p>Правильных пар: <strong>{{ session.correct_count|default:0 }}</strong></p>
+                {% if session.wrong_attempts %}
+                    <p>Ошибок: <strong>{{ session.wrong_attempts }}</strong></p>
+                {% endif %}
+                {% if duration_label %}
+                    <p>Время: <strong>{{ duration_label }}</strong></p>
+                {% endif %}
+                <p>Изучено в уровне: <strong>{{ progress.learned }} / {{ progress.total }}</strong></p>
+            </div>
+            <div class="inline-actions" style="margin-top: 24px; flex-wrap: wrap; gap: 12px;">
+                <a class="btn btn-primary btn-pill" href="{% url 'core:match_play' group.slug %}?restart=1">Ещё раунд</a>
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:match_levels' %}">Другой уровень</a>
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:profile' %}">В профиль</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

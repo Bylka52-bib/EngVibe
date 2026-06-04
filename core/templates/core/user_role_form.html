@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+
+{% block title %}Смена роли - EngVibe{% endblock %}
+
+{% block body_class %}page-bento-form{% endblock %}
+
+{% block content %}
+
+<section class="page-shell bento-form-page user-role-form-page">
+
+    <div class="container container--narrow">
+
+        <div class="bento-form-hero muted-band bento-form-hero--role">
+
+            <h1>Пользователь: {{ managed_user.username }}</h1>
+
+            <p class="page-lead bento-form-lead">Выберите группу доступа. Изменения применяются сразу после сохранения.</p>
+
+        </div>
+
+        <form method="post" class="bento-form-card surface-card bento-highlight bento-form-card--role">
+
+            {% csrf_token %}
+
+            {% include 'core/includes/bento_form_field.html' with field=form.role only %}
+
+            <div class="bento-form-actions">
+
+                <button class="btn btn-primary btn-pill" type="submit">Сохранить</button>
+
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:admin_panel' %}?tab=users">К списку</a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% include 'core/includes/bento_form_assets.html' %}
+
+{% endblock %}
+

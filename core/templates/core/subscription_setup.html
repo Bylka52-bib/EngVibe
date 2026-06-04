@@ -1,0 +1,109 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Настройка подписки – EngVibe{% endblock %}
+{% block body_class %}page-bento-form page-subscription-setup{% endblock %}
+{% block content %}
+<section class="page-shell bento-form-page">
+    <div class="container">
+        <div class="bento-form-hero muted-band">
+            <h1>Выберите доступ к курсам</h1>
+            <p class="page-lead">
+                Это делается <strong>один раз</strong> при оформлении подписки.
+                {% if has_groups and max_n %}
+                    Либо готовая группа, либо ровно <strong>{{ max_n }}</strong> курсов из каталога – не оба варианта сразу.
+                {% elif has_groups %}
+                    Выберите одну группу курсов.
+                {% elif max_n %}
+                    Отметьте ровно <strong>{{ max_n }}</strong> курса из каталога.
+                {% endif %}
+            </p>
+        </div>
+
+        <form method="post" class="subscription-setup-form pick-setup-form" id="subscription-setup-form">
+            {% csrf_token %}
+            <input type="hidden" name="choice_mode" id="choice-mode-input" value="">
+
+            {% if has_groups %}
+            <div class="setup-section setup-section--groups" id="setup-group-section">
+                <h2 class="setup-section__title">Вариант 1 – группа курсов</h2>
+                <p class="meta setup-section__lead">Все курсы из группы сразу попадут в подписку.</p>
+                <div class="courses-grid courses-grid--pick">
+                    {% for group in groups %}
+                        <label class="course-card pick-select-card pick-group-card" data-pick-type="group">
+                            <input
+                                type="radio"
+                                name="group_id"
+                                value="{{ group.pk }}"
+                                class="pick-select-input pick-group-input"
+                            >
+                            <span class="pick-select-check" aria-hidden="true"><span class="pick-select-check__icon"></span></span>
+                            <div class="pick-group-card__body">
+                                <p class="course-card__level">{{ group.name }}</p>
+                                {% if group.description %}
+                                    <p class="course-card__desc">{{ group.description }}</p>
+                                {% endif %}
+                                <p class="pick-group-card__count">Курсов в группе: {{ group.course_count }}</p>
+                            </div>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if max_n and has_groups %}
+            <p class="setup-divider meta">или</p>
+            {% endif %}
+
+            {% if max_n %}
+            <div class="setup-section setup-section--courses" id="setup-courses-section">
+                <h2 class="setup-section__title">{% if has_groups %}Вариант 2 – {% endif %}свои курсы</h2>
+                <p class="meta setup-section__lead">
+                    Отметьте ровно <strong>{{ max_n }}</strong>
+                    {% if max_n == 1 %}курс{% elif max_n < 5 %}курса{% else %}курсов{% endif %}
+                    (выбрано: <span id="courses-picked-count">0</span> / {{ max_n }}).
+                </p>
+                <div class="courses-grid courses-grid--pick" id="setup-courses-grid">
+                    {% for course in catalog %}
+                        {% cycle 'core/img/course-1.jpg' 'core/img/course-2.jpg' 'core/img/course-3.jpg' 'core/img/course-4.jpg' as default_course_img silent %}
+                        <label class="course-card pick-select-card pick-course-card" data-pick-type="course">
+                            <input
+                                type="checkbox"
+                                name="course_ids"
+                                value="{{ course.pk }}"
+                                class="pick-select-input pick-course-input"
+                            >
+                            <span class="pick-select-check" aria-hidden="true"><span class="pick-select-check__icon"></span></span>
+                            <div class="course-card__img">
+                                {% if course.thumbnail %}
+                                    <img loading="lazy" src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+                                {% else %}
+                                    <img loading="lazy" src="{% static default_course_img %}" alt="{{ course.title }}">
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="course-card__level">{{ course.level }}</p>
+                                <p class="course-card__title">{{ course.title }}</p>
+                                <p class="course-card__desc">{{ course.short_description }}</p>
+                            </div>
+                        </label>
+                    {% empty %}
+                        <p class="meta">Нет опубликованных курсов.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="bento-form-actions pick-courses-actions">
+                <button type="submit" class="btn btn-primary btn-pill" id="setup-submit-btn">Подтвердить выбор</button>
+            </div>
+        </form>
+    </div>
+</section>
+<script>
+  window.__subscriptionSetup = {
+    maxCourses: {{ max_n|default:0 }},
+    hasGroups: {{ has_groups|yesno:"true,false" }}
+  };
+</script>
+<script src="{% static 'core/js/subscription_setup.js' %}"></script>
+{% endblock %}

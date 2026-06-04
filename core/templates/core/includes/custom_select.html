@@ -1,0 +1,42 @@
+<div class="role-select-wrap{% if wrap_class %} {{ wrap_class }}{% endif %}" data-role-select{% if auto_submit %} data-auto-submit{% endif %}>
+    <select
+        name="{{ field_name }}"
+        id="{{ field_id }}"
+        class="role-select-native visually-hidden"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        {% for value, label in options %}
+            <option value="{{ value }}"{% if current_value|stringformat:"s" == value|stringformat:"s" %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <button
+        type="button"
+        class="role-select__trigger"
+        id="{% if trigger_id %}{{ trigger_id }}{% else %}{{ field_id }}-trigger{% endif %}"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+        aria-controls="{{ field_id }}-listbox"
+    >
+        <span class="role-select__value">
+            {% for value, label in options %}
+                {% if current_value|stringformat:"s" == value|stringformat:"s" %}{{ label }}{% endif %}
+            {% endfor %}
+        </span>
+        <span class="role-select__arrow" aria-hidden="true">
+            <svg width="14" height="9" viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L7 7.5L13 1" stroke="#F14D62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </span>
+    </button>
+    <ul class="role-select__list" id="{{ field_id }}-listbox" role="listbox" tabindex="-1" hidden>
+        {% for value, label in options %}
+            <li
+                class="role-select__option{% if current_value|stringformat:"s" == value|stringformat:"s" %} is-selected{% endif %}"
+                role="option"
+                data-value="{{ value }}"
+                aria-selected="{% if current_value|stringformat:"s" == value|stringformat:"s" %}true{% else %}false{% endif %}"
+            >{{ label }}</li>
+        {% endfor %}
+    </ul>
+</div>

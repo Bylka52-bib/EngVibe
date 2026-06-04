@@ -1,0 +1,26 @@
+{% load form_fields %}
+{% if field|is_multi_checkbox_field %}
+    {% include 'core/includes/custom_multi_select.html' with field=field only %}
+{% elif field.field.widget.input_type == 'checkbox' %}
+    <div class="bento-form-check">
+        {{ field }}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    </div>
+    {{ field.errors }}
+{% elif field|is_file_image_field %}
+    {% if field.name == 'avatar' %}
+        {% include 'core/includes/image_upload.html' with field=field variant='round' button_text='Загрузите аватар' only %}
+    {% else %}
+        {% include 'core/includes/image_upload.html' with field=field variant='square' button_text='Загрузить фото' only %}
+    {% endif %}
+{% elif field|is_select_field %}
+    <label for="{{ field.id_for_label }}-trigger">{{ field.label }}</label>
+    {% include 'core/includes/custom_select.html' with field_name=field.html_name field_id=field.id_for_label trigger_id=field.id_for_label|add:'-trigger' current_value=field.value|default:'' options=field|select_field_options only %}
+    {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+    {{ field.errors }}
+{% else %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+    {{ field.errors }}
+{% endif %}

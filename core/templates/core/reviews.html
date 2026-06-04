@@ -1,0 +1,174 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Отзывы – EngVibe{% endblock %}
+{% block body_class %}page-reviews{% endblock %}
+{% block content %}
+<section class="page-shell reviews-page">
+    <div class="container">
+        <div class="reviews-page-hero">
+            <div class="reviews-hero-bento">
+                <div class="reviews-title-card reviews-title-card--page">
+                    <h2>Отзывы<br>наших учеников</h2>
+                </div>
+                <div class="reviews-hero-intro reviews-hero-intro--pink">
+                    <p class="reviews-hero-kicker">Сообщество</p>
+                    <h1 class="reviews-page-title">Честные впечатления</h1>
+                    <p class="reviews-hero-lead">Здесь собраны отзывы учеников EngVibe. Поделитесь своим опытом – это помогает нам становиться лучше.</p>
+                    <div class="inline-actions reviews-hero-actions">
+                        <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:courses' %}">Каталог курсов</a>
+                        <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:tariffs' %}">Тарифы</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="reviews-form-section muted-band--yellow">
+            <div class="reviews-form-layout">
+                <div class="reviews-form-head">
+                    <h2 class="why-heading reviews-form-title">Оставить отзыв</h2>
+                    <p class="reviews-form-lead">Оценка и несколько предложений о занятиях – этого достаточно.</p>
+                </div>
+                {% if user.is_authenticated %}
+                    <form method="post" class="reviews-form" novalidate>
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="reviews-nonfield" role="alert">{{ form.non_field_errors }}</div>
+                        {% endif %}
+                        <div class="reviews-form-stack">
+                            <div class="reviews-form-field reviews-form-field--rating">
+                                <span class="reviews-form-rating-label">{{ form.rating.label }}</span>
+                                {{ form.rating }}
+                                {{ form.rating.errors }}
+                            </div>
+                            <div class="reviews-form-field">
+                                {% include 'core/includes/bento_form_field.html' with field=form.text only %}
+                            </div>
+                        </div>
+                        <div class="bento-form-actions reviews-form-actions">
+                            <button type="submit" class="btn btn-primary btn-pill">Опубликовать отзыв</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="reviews-form reviews-form--guest">
+                        <p class="reviews-guest-text">Чтобы оставить отзыв, войдите в аккаунт – имя в отзыве подставится из профиля.</p>
+                        <div class="inline-actions reviews-guest-actions">
+                            <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:login' %}?next={% url 'core:reviews' %}">Войти</a>
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:signup' %}">Регистрация</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="reviews-list-section">
+            <div class="reviews-bento-grid" data-reviews-grid data-batch-size="{{ reviews_batch_size }}">
+                {% for review in reviews %}
+                    <div class="reviews-grid-item{% if forloop.counter > reviews_batch_size %} is-review-hidden{% endif %}" data-review-item>
+                        {% include 'core/includes/review_card.html' with review=review wide=True show_date=True %}
+                    </div>
+                {% empty %}
+                    <article class="surface-card bento-highlight reviews-empty-card">
+                        <p class="reviews-empty-title">Пока нет опубликованных отзывов</p>
+                        <p class="meta">Станьте первым – оставьте отзыв в форме выше.</p>
+                    </article>
+                {% endfor %}
+            </div>
+            {% if reviews|length > reviews_batch_size %}
+                <div class="reviews-load-more-wrap">
+                    <button type="button" class="btn btn-outline-pink btn-pill" data-reviews-load-more>
+                        Смотреть ещё
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+<script>
+(function () {
+    document.querySelectorAll('.star-rating').forEach(function (group) {
+        var stars = group.querySelectorAll('.star-rating__star');
+        var inputs = group.querySelectorAll('input[type="radio"]');
+
+        function paint() {
+            var value = parseInt(group.querySelector('input[type="radio"]:checked')?.value || '0', 10);
+            stars.forEach(function (star, index) {
+                star.classList.toggle('is-active', index < value);
+            });
+        }
+
+        stars.forEach(function (star, index) {
+            star.addEventListener('mouseenter', function () {
+                stars.forEach(function (s, i) {
+                    s.classList.toggle('is-active', i <= index);
+                });
+            });
+            star.addEventListener('click', function () {
+                paint();
+            });
+        });
+
+        group.addEventListener('mouseleave', paint);
+        inputs.forEach(function (input) {
+            input.addEventListener('change', paint);
+        });
+        paint();
+    });
+
+    var grid = document.querySelector('[data-reviews-grid]');
+    var loadMoreBtn = document.querySelector('[data-reviews-load-more]');
+    if (!grid) return;
+
+    var items = Array.prototype.slice.call(grid.querySelectorAll('[data-review-item]'));
+    var mobileReviews = window.matchMedia('(max-width: 768px)');
+
+    function getBatchSize() {
+        return mobileReviews.matches ? 4 : 3;
+    }
+
+    function applyVisibleBatch() {
+        var batchSize = getBatchSize();
+        items.forEach(function (el, index) {
+            el.classList.toggle('is-review-hidden', index >= batchSize);
+        });
+    }
+
+    function updateLoadMoreButton() {
+        if (!loadMoreBtn) return;
+        var hasHidden = items.some(function (el) {
+            return el.classList.contains('is-review-hidden');
+        });
+        loadMoreBtn.style.display = hasHidden ? '' : 'none';
+    }
+
+    applyVisibleBatch();
+    updateLoadMoreButton();
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function () {
+            var revealed = 0;
+            var batchSize = getBatchSize();
+            items.forEach(function (el) {
+                if (revealed >= batchSize) return;
+                if (el.classList.contains('is-review-hidden')) {
+                    el.classList.remove('is-review-hidden');
+                    revealed += 1;
+                }
+            });
+            updateLoadMoreButton();
+        });
+    }
+
+    if (typeof mobileReviews.addEventListener === 'function') {
+        mobileReviews.addEventListener('change', function () {
+            applyVisibleBatch();
+            updateLoadMoreButton();
+        });
+    } else if (typeof mobileReviews.addListener === 'function') {
+        mobileReviews.addListener(function () {
+            applyVisibleBatch();
+            updateLoadMoreButton();
+        });
+    }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% block title %}Составь предложение – EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell sentence-builder-levels-page">
+    <div class="container">
+        <div class="flashcards-page-toolbar">
+            <a class="flashcards-page-back meta" href="{% url 'core:profile' %}">← В профиль</a>
+        </div>
+        <div class="page-head" style="margin-bottom: 28px;">
+            <h1>Составь предложение</h1>
+            <p class="meta">Соберите предложение из слов в правильном порядке и нажмите «Проверить».</p>
+            {% if stats.total %}
+                <p class="meta">Всего решено: <strong>{{ stats.solved }}</strong> из <strong>{{ stats.total }}</strong></p>
+            {% endif %}
+        </div>
+
+        <div class="card-grid card-grid--3 sentence-level-grid">
+            {% for row in levels %}
+                <div class="surface-card sentence-level-card">
+                    <h3 style="margin: 0 0 8px;">{{ row.label }}</h3>
+                    {% if row.progress.total %}
+                        <p class="meta">Решено: {{ row.progress.solved }} / {{ row.progress.total }}</p>
+                        <div class="progress-line" style="margin: 12px 0;"><span style="width: {{ row.progress.percent }}%;"></span></div>
+                        <div class="sentence-level-card__actions">
+                            {% if row.progress.solved < row.progress.total %}
+                                <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:sentence_builder_play' row.code %}">Играть</a>
+                            {% endif %}
+                            {% if row.progress.solved %}
+                                <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:sentence_builder_play' row.code %}?restart=all" data-confirm-restart>Начать заново</a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="meta" style="margin: 0;">Задания скоро появятся</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% include 'core/includes/flashcards_confirm.html' %}
+{% endblock %}

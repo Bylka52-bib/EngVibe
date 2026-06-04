@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %}
+{% block title %}Оплата: {{ plan.name }} – EngVibe{% endblock %}
+{% block body_class %}page-bento-form{% endblock %}
+{% block content %}
+<section class="page-shell bento-form-page checkout-page">
+    <div class="container container--narrow">
+        <div class="bento-form-hero muted-band">
+            <p class="chip">Оплата подписки</p>
+            <h1>{{ plan.name }}</h1>
+            <p class="page-lead">{{ plan.tagline }}</p>
+        </div>
+        <form method="post" class="surface-card bento-highlight bento-form-card bento-form-card--wide checkout-form" id="checkout-form">
+            {% csrf_token %}
+            <p class="checkout-price"><strong>{{ plan.price }} ₽</strong> за {{ plan.billing_days }} дн.</p>
+            <ul class="tariff-features checkout-perks">
+                {% if plan.perks %}
+                    {% for line in plan.perks.splitlines %}
+                        {% if line.strip %}<li>{{ line.strip }}</li>{% endif %}
+                    {% endfor %}
+                {% endif %}
+            </ul>
+            {% include 'core/includes/demo_payment_form.html' with payment_form=payment_form %}
+            <div class="bento-form-actions">
+                <button type="submit" class="btn btn-primary btn-pill" id="checkout-submit">Оплатить {{ plan.price }} ₽</button>
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:tariffs' %}">Назад к тарифам</a>
+            </div>
+        </form>
+    </div>
+</section>
+<script>
+(function () {
+    var form = document.getElementById('checkout-form');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+        var confirm = form.querySelector('[name="confirm_purchase"]');
+        if (confirm && !confirm.checked) {
+            e.preventDefault();
+            alert('Отметьте подтверждение оплаты.');
+            return;
+        }
+        if (!window.confirm('Подтвердить списание {{ plan.price }} ₽ с карты (демо)?')) {
+            e.preventDefault();
+        }
+    });
+})();
+</script>
+{% endblock %}

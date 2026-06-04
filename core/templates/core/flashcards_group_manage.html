@@ -1,0 +1,66 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ group.name }} – мои карточки{% endblock %}
+{% block body_class %}page-bento-form page-flashcards-manage{% endblock %}
+{% block content %}
+<section class="page-shell bento-form-page flashcards-manage-page">
+    <div class="container">
+        <div class="flashcards-page-toolbar">
+            <a class="flashcards-page-back meta" href="{% url 'core:flashcards_groups' %}">← К группам</a>
+        </div>
+
+        <div class="bento-form-hero muted-band flashcards-manage-hero">
+            <h1>{{ group.name }}</h1>
+            <p class="page-lead bento-form-lead">Добавьте пары «слово — перевод». Когда в группе появятся карточки, можно начать учить.</p>
+        </div>
+
+        <div class="flashcards-manage-layout">
+            <form method="post" class="bento-form-card surface-card bento-highlight flashcards-manage-add">
+                {% csrf_token %}
+                {{ card_form.non_field_errors }}
+                <h2 class="profile-section__title">Добавить карточку</h2>
+                {% for field in card_form %}
+                    {% include 'core/includes/bento_form_field.html' with field=field only %}
+                {% endfor %}
+                <div class="bento-form-actions">
+                    <button type="submit" class="btn btn-primary btn-pill">Добавить</button>
+                </div>
+            </form>
+
+            <div class="surface-card bento-highlight flashcards-manage-list">
+                <h2 class="profile-section__title">Карточки в группе</h2>
+                {% if cards %}
+                    <ul class="flashcards-word-list">
+                        {% for c in cards %}
+                            <li><strong>{{ c.word_en }}</strong> – {{ c.word_ru }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="meta flashcards-manage-empty">Пока нет карточек. Добавьте первую в форме слева.</p>
+                {% endif %}
+                {% if has_cards %}
+                    <div class="bento-form-actions flashcards-manage-list-actions">
+                        <a class="btn btn-primary btn-pill" href="{% url 'core:flashcards_play' group.slug %}">Начать учить</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <form
+                method="post"
+                class="bento-form-card surface-card bento-highlight flashcards-manage-delete"
+                data-fc-confirm
+                data-fc-confirm-title="Удалить группу?"
+                data-fc-confirm-text="Группа «{{ group.name }}» и все карточки в ней будут удалены без возможности восстановления."
+            >
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete_group">
+                <h2 class="profile-section__title">Удалить группу</h2>
+                <p class="meta">Все слова и прогресс по этой колоде будут потеряны.</p>
+                <div class="bento-form-actions">
+                    <button type="submit" class="btn btn-outline-pink btn-pill">Удалить группу</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% include 'core/includes/flashcards_confirm.html' %}
+{% endblock %}

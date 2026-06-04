@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% block title %}Регистрация - EngVibe{% endblock %}
+{% block body_class %}page-auth{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+    <div class="container">
+        <form method="post" class="auth-card">
+            <h1>Регистрация</h1>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <label for="{{ form.username.id_for_label }}">Логин</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+            <label for="{{ form.password1.id_for_label }}">Пароль</label>
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+            <label for="{{ form.password2.id_for_label }}">Подтверждение пароля</label>
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+            <button type="submit" class="btn btn-primary btn-pill">Создать аккаунт</button>
+            <p>Уже есть аккаунт? <a href="{% url 'core:login' %}">Войти</a></p>
+        </form>
+    </div>
+</section>
+{% endblock %}

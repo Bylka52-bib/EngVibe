@@ -1,0 +1,214 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ level_label }} – Составь предложение{% endblock %}
+{% block content %}
+<section class="page-shell sentence-builder-page">
+    <div class="container">
+        <div class="sentence-builder-topbar">
+            <a href="{% url 'core:sentence_builder_levels' %}" class="flashcards-page-back meta">← К уровням</a>
+        </div>
+    </div>
+    <div class="container container--narrow">
+        <div class="sentence-builder-header">
+            <h1>{{ level_label }}</h1>
+            <p class="meta">
+                Задание <span id="sb-current">{{ current_num }}</span> / <span id="sb-total">{{ session_total }}</span>
+                · В сессии верно: <span id="sb-session-correct">{{ session.correct_count|default:0 }}</span>
+                · Решено: <span id="sb-solved">{{ progress.solved }}</span> / <span id="sb-level-total">{{ progress.total }}</span>
+            </p>
+            <div class="progress-line"><span id="sb-progress-bar" style="width: {{ progress.percent }}%;"></span></div>
+            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:sentence_builder_play' level %}?restart=1" data-confirm-restart>Начать сначала</a>
+        </div>
+
+        <div class="surface-card sentence-builder-card" id="sb-card">
+            <p class="meta sentence-builder-hint">Нажимайте на слова по порядку. Нажатие в зоне ответа возвращает слово обратно.</p>
+
+            <div class="sentence-builder-zone">
+                <p class="sentence-builder-zone__label">Ваше предложение</p>
+                <div class="sentence-builder-answer" id="sb-answer"></div>
+            </div>
+
+            <div class="sentence-builder-zone sentence-builder-zone--words">
+                <p class="sentence-builder-zone__label">Слова</p>
+                <div class="sentence-builder-pool" id="sb-pool">
+                    {% for word in shuffled_words %}
+                        <button type="button" class="sentence-word-chip" data-word="{{ word }}">{{ word }}</button>
+                    {% endfor %}
+                </div>
+                <p class="sentence-builder-feedback" id="sb-feedback" hidden role="alert"></p>
+            </div>
+
+            <div class="inline-actions sentence-builder-actions" id="sb-actions">
+                <button type="button" class="btn btn-outline-pink btn-pill" id="sb-reset">Сбросить</button>
+                <button type="button" class="btn btn-primary btn-pill" id="sb-check">Проверить</button>
+                <button type="button" class="btn btn-primary btn-pill" id="sb-next" hidden>Дальше</button>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+(function () {
+    var taskId = {{ task.id }};
+    var checkUrl = "{% url 'core:sentence_builder_check' level %}";
+    var csrfToken = "{{ csrf_token }}";
+
+    var poolEl = document.getElementById('sb-pool');
+    var answerEl = document.getElementById('sb-answer');
+    var cardEl = document.getElementById('sb-card');
+    var feedbackEl = document.getElementById('sb-feedback');
+    var resetBtn = document.getElementById('sb-reset');
+    var checkBtn = document.getElementById('sb-check');
+    var nextBtn = document.getElementById('sb-next');
+    var busy = false;
+    var pendingNext = null;
+
+    function bindChips(root) {
+        root.querySelectorAll('.sentence-word-chip').forEach(function (chip) {
+            if (chip.dataset.bound) return;
+            chip.dataset.bound = '1';
+            chip.addEventListener('click', onChipClick);
+        });
+    }
+
+    function onChipClick(e) {
+        if (busy) return;
+        var chip = e.currentTarget;
+        if (chip.parentElement === poolEl) {
+            answerEl.appendChild(chip);
+        } else {
+            poolEl.appendChild(chip);
+        }
+        clearSuccessUi();
+    }
+
+    function getAnswerOrder() {
+        return Array.from(answerEl.querySelectorAll('.sentence-word-chip')).map(function (el) {
+            return el.dataset.word;
+        });
+    }
+
+    function clearSuccessUi() {
+        feedbackEl.hidden = true;
+        feedbackEl.classList.remove('is-error', 'is-success');
+        answerEl.classList.remove('is-correct');
+        cardEl.classList.remove('is-success-state');
+        resetBtn.hidden = false;
+        checkBtn.hidden = false;
+        nextBtn.hidden = true;
+        pendingNext = null;
+    }
+
+    function showFeedback(text, isError) {
+        feedbackEl.textContent = text;
+        feedbackEl.hidden = false;
+        feedbackEl.classList.toggle('is-error', isError);
+        feedbackEl.classList.toggle('is-success', !isError);
+    }
+
+    function showSuccessState(message, data) {
+        pendingNext = data;
+        showFeedback(message || 'Верно!', false);
+        answerEl.classList.add('is-correct');
+        cardEl.classList.add('is-success-state');
+        resetBtn.hidden = true;
+        checkBtn.hidden = true;
+        nextBtn.hidden = false;
+        busy = true;
+    }
+
+    function resetBoard(words) {
+        answerEl.innerHTML = '';
+        poolEl.innerHTML = '';
+        words.forEach(function (word) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'sentence-word-chip';
+            btn.dataset.word = word;
+            btn.textContent = word;
+            poolEl.appendChild(btn);
+        });
+        bindChips(poolEl);
+    }
+
+    document.getElementById('sb-reset').addEventListener('click', function () {
+        if (busy) return;
+        var words = Array.from(poolEl.querySelectorAll('.sentence-word-chip'))
+            .concat(Array.from(answerEl.querySelectorAll('.sentence-word-chip')))
+            .map(function (el) { return el.dataset.word; });
+        resetBoard(words);
+        clearSuccessUi();
+    });
+
+    function updateStats(data) {
+        if (data.progress) {
+            document.getElementById('sb-solved').textContent = data.progress.solved;
+            document.getElementById('sb-level-total').textContent = data.progress.total;
+            document.getElementById('sb-progress-bar').style.width = data.progress.percent + '%';
+        }
+        if (data.current_num) {
+            document.getElementById('sb-current').textContent = data.current_num;
+        }
+        if (data.session_total) {
+            document.getElementById('sb-total').textContent = data.session_total;
+        }
+        if (data.session_correct !== undefined) {
+            document.getElementById('sb-session-correct').textContent = data.session_correct;
+        }
+    }
+
+    document.getElementById('sb-next').addEventListener('click', function () {
+        if (!pendingNext) return;
+        var data = pendingNext;
+        pendingNext = null;
+        if (data.done) {
+            window.location.href = data.redirect_url;
+            return;
+        }
+        taskId = data.task.id;
+        resetBoard(data.task.words);
+        updateStats(data);
+        clearSuccessUi();
+        busy = false;
+    });
+
+    document.getElementById('sb-check').addEventListener('click', function () {
+        if (busy) return;
+        var order = getAnswerOrder();
+        if (!order.length) {
+            showFeedback('Соберите предложение из слов.', true);
+            return;
+        }
+        busy = true;
+        fetch(checkUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ task_id: taskId, order: order })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.error) {
+                showFeedback(data.error, true);
+                busy = false;
+                return;
+            }
+            if (!data.correct) {
+                showFeedback(data.message || 'Неверный порядок.', true);
+                busy = false;
+                return;
+            }
+            updateStats(data);
+            showSuccessState('Верно! Предложение составлено правильно.', data);
+        })
+        .catch(function () {
+            showFeedback('Ошибка сети. Попробуйте ещё раз.', true);
+            busy = false;
+        });
+    });
+
+    bindChips(poolEl);
+})();
+</script>
+{% include 'core/includes/flashcards_confirm.html' %}
+{% endblock %}

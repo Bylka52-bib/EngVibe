@@ -1,0 +1,124 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Профиль - EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell">
+    <div class="container">
+        <div class="profile-layout">
+            
+            <!-- ЛЕВАЯ КОЛОНКА - карточка пользователя -->
+            <div>
+                <div class="surface-card profile-sidebar-card">
+                    {% if user.profile.avatar %}
+                        <img loading="lazy" src="{{ user.profile.avatar.url }}" alt="" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; margin: 0 auto 20px;">
+                    {% else %}
+                        <div class="user-avatar-placeholder user-avatar-placeholder--profile" role="img" aria-label="Аватар не загружен">
+                            <img loading="lazy" class="user-avatar-placeholder__icon" src="{% static 'core/img/icon-profil.svg' %}" alt="" aria-hidden="true">
+                        </div>
+                    {% endif %}
+                    
+                    <h2 style="margin: 0 0 8px;">{{ user.username }}</h2>
+                    <p class="meta" style="margin-bottom: 8px;">{{ user.email }}</p>
+                    <p class="profile-subscription-line meta" style="margin-bottom: 12px;">
+                        {% if active_subscription %}
+                            Подписка: <strong>{{ active_subscription.plan.name }}</strong>
+                            до {{ active_subscription.expires_at|date:"d.m.Y" }}
+                        {% elif single_purchased_courses %}
+                            Без подписки · разовый доступ:
+                            {% for c in single_purchased_courses %}
+                                <strong>{{ c.title }}</strong>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            Нет активной подписки
+                        {% endif %}
+                    </p>
+                    
+                    <div style="display: inline-block; background: var(--pink-soft); padding: 6px 16px; border-radius: 999px; margin-bottom: 24px;">
+                        <span style="font-size: 14px; font-weight: 600;">
+                            {% if user.groups.first.name == 'admin_group' %}Администратор
+                            {% elif user.groups.first.name == 'teacher_group' %}Преподаватель
+                            {% else %}Ученик{% endif %}
+                        </span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a class="btn btn-outline-pink btn-pill" href="{% url 'core:profile_edit' %}" style="width: 100%;">Редактировать профиль</a>
+                        
+                        {% if user.groups.first.name == 'admin_group' %}
+                            <a class="btn btn-primary btn-pill" href="{% url 'core:admin_panel' %}" style="width: 100%;">Админ-панель</a>
+                        {% elif user.groups.first.name == 'teacher_group' %}
+                            <a class="btn btn-primary btn-pill" href="{% url 'core:teacher_panel' %}" style="width: 100%;">Панель преподавателя</a>
+                        {% endif %}
+                        
+                        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.08);">
+                            <a class="btn btn-outline-pink btn-pill" href="{% url 'core:logout' %}" style="width: 100%; color: #b00020; border-color: #b00020;">Выйти</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ПРАВАЯ КОЛОНКА - контент в зависимости от роли -->
+            <div class="surface-card profile-main-card">
+                {% if user.groups.first.name == 'admin_group' %}
+                    <h3 class="profile-section__title">Управление ролями</h3>
+                    <div class="admin-list">
+                        {% for u in all_users %}
+                            <div style="display: flex; flex-direction: column; justify-content: space-between; align-items: start; padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <div>
+                                    <strong>{{ u.username }}</strong>
+                                    <p class="meta" style="margin: 0;">{{ u.email }}</p>
+                                    <p class="meta">Роль: 
+                                        {% if u.groups.first.name == 'admin_group' %}Администратор
+                                        {% elif u.groups.first.name == 'teacher_group' %}Преподаватель
+                                        {% else %}Пользователь{% endif %}
+                                    </p>
+                                </div>
+                                <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:user_role_update' u.id %}">Сменить роль</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                {% elif user.groups.first.name == 'teacher_group' %}
+                    <h3 class="profile-section__title">Мои курсы</h3>
+                    {% if teacher_courses %}
+                        <div class="card-grid card-grid--2">
+                            {% for course in teacher_courses %}
+                                <div class="surface-card" style="padding: 16px;">
+                                    <h4 style="margin: 0 0 8px;">{{ course.title }}</h4>
+                                    <p class="meta">{{ course.level }} · {{ course.duration }}</p>
+                                    <p>{{ course.short_description|truncatechars:80 }}</p>
+                                    <div class="inline-actions" style="margin-top: 12px;">
+                                        <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:course_detail' course.slug %}">К курсу</a>
+                                        <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:teacher_panel' %}">Управлять</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="meta">Вам ещё не назначены курсы. Обратитесь к администратору.</p>
+                    {% endif %}
+
+                {% else %}
+                    <h3 class="profile-section__title">Мой прогресс</h3>
+                    {% if progress_rows %}
+                        <div class="card-grid card-grid--2">
+                            {% for row in progress_rows %}
+                                <div>
+                                    <h4 style="margin: 0 0 8px;">{{ row.course.title }}</h4>
+                                    <p class="meta">Прогресс: {{ row.completed_lessons }} / {{ row.total_lessons }} уроков ({{ row.percent }}%)</p>
+                                    <div class="progress-line"><span style="width: {{ row.percent }}%;"></span></div>
+                                    <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:course_detail' row.course.slug %}" style="margin-top: 12px; display: inline-block;">Продолжить</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="meta">Нет курсов с доступом. <a href="{% url 'core:tariffs' %}">Тарифы</a> · <a href="{% url 'core:courses' %}">Каталог</a> (разовая покупка курсов без подписки).</p>
+                    {% endif %}
+                {% endif %}
+
+                {% include 'core/includes/profile_games.html' %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

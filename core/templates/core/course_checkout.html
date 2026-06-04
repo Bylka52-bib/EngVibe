@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% block title %}Покупка курса: {{ course.title }} – EngVibe{% endblock %}
+{% block body_class %}page-bento-form{% endblock %}
+{% block content %}
+<section class="page-shell bento-form-page checkout-page">
+    <div class="container container--narrow">
+        <div class="bento-form-hero muted-band">
+            <p class="chip">Разовая покупка</p>
+            <h1>{{ course.title }}</h1>
+            <p class="page-lead">Полный доступ к урокам и тестам курса после оплаты.</p>
+        </div>
+        <form method="post" class="surface-card bento-highlight bento-form-card bento-form-card--wide checkout-form" id="checkout-form">
+            {% csrf_token %}
+            <p class="checkout-price"><strong>{{ course.price }} ₽</strong> за полный доступ</p>
+            <p class="meta">Несколько курсов? Смотрите <a href="{% url 'core:tariffs' %}">тарифы</a>.</p>
+            {% include 'core/includes/demo_payment_form.html' with payment_form=payment_form %}
+            <div class="bento-form-actions">
+                <button type="submit" class="btn btn-primary btn-pill" id="checkout-submit">Оплатить {{ course.price }} ₽</button>
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:course_detail' course.slug %}">Назад к курсу</a>
+            </div>
+        </form>
+    </div>
+</section>
+<script>
+(function () {
+    var form = document.getElementById('checkout-form');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+        var confirm = form.querySelector('[name="confirm_purchase"]');
+        if (confirm && !confirm.checked) {
+            e.preventDefault();
+            alert('Отметьте подтверждение оплаты.');
+            return;
+        }
+        if (!window.confirm('Подтвердить списание {{ course.price }} ₽ за курс «{{ course.title|escapejs }}» (демо)?')) {
+            e.preventDefault();
+        }
+    });
+})();
+</script>
+{% endblock %}

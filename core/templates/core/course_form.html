@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ title }} - EngVibe{% endblock %}
+
+{% block body_class %}page-bento-form{% endblock %}
+
+{% block content %}
+
+<section class="page-shell bento-form-page">
+
+    <div class="container container--narrow">
+
+        <div class="bento-form-hero muted-band">
+
+            <h1>{{ title }}</h1>
+
+            {% if form_lead %}
+
+                <p class="page-lead bento-form-lead">{{ form_lead }}</p>
+
+            {% endif %}
+
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="bento-form-card surface-card bento-highlight bento-form-card--wide">
+
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+
+                {% include 'core/includes/bento_form_field.html' with field=field only %}
+
+            {% endfor %}
+
+            <div class="bento-form-actions">
+
+                <button class="btn btn-primary btn-pill" type="submit">Сохранить</button>
+
+                <a class="btn btn-outline-pink btn-pill" href="{{ form_cancel_url }}">Отмена</a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% include 'core/includes/bento_form_assets.html' %}
+
+{% endblock %}
+

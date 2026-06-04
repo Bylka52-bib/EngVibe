@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ title }} - EngVibe{% endblock %}
+
+{% block body_class %}page-bento-form{% endblock %}
+
+{% block content %}
+
+<section class="page-shell bento-form-page">
+
+    <div class="container container--narrow">
+
+        <div class="bento-form-hero muted-band">
+
+            <h1>{{ title }}</h1>
+
+            <p class="page-lead bento-form-lead">Привяжите группу к тарифу и выберите курсы – пользователи получат доступ ко всем курсам группы при оформлении подписки.</p>
+
+        </div>
+
+        <form method="post" class="surface-card bento-form-card bento-highlight course-group-form">
+
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+
+                <div class="bento-form-field bento-form-field--{{ field.name }}">
+
+                    {% include 'core/includes/bento_form_field.html' with field=field only %}
+
+                </div>
+
+            {% endfor %}
+
+            <div class="bento-form-actions">
+
+                <button class="btn btn-primary btn-pill" type="submit">Сохранить</button>
+
+                <a class="btn btn-outline-pink btn-pill" href="{{ cancel_url }}">Отмена</a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% include 'core/includes/bento_form_assets.html' %}
+
+{% endblock %}
+

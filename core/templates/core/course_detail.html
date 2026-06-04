@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{ course.title }} - EngVibe{% endblock %}
+{% block content %}
+<section class="page-shell course-detail-page">
+    <div class="container">
+        <div class="course-detail-hero muted-band">
+            <div class="course-detail-hero-grid">
+                <div class="course-detail-visual surface-card bento-highlight">
+                    {% if course.thumbnail %}
+                        <img loading="lazy" src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+                    {% else %}
+                        <img loading="lazy" src="{% static 'core/img/course-1.jpg' %}" alt="{{ course.title }}">
+                    {% endif %}
+                </div>
+                <div class="course-detail-intro{% if not has_access %} course-detail-intro--locked{% endif %}">
+                    <h1 class="course-detail-title">{{ course.title }}</h1>
+                    <p class="course-detail-short">{{ course.short_description }}</p>
+                    <p class="course-detail-duration meta">Длительность: {{ course.duration }}</p>
+                    {% if has_access %}
+                        <div class="course-detail-badge course-detail-badge--ok">
+                            <span class="course-detail-badge-icon" aria-hidden="true"></span>
+                            {% if access_via_enrollment %}
+                                <span>Курс приобретён</span>
+                            {% else %}
+                                <span>Доступ по подписке активен</span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="course-detail-cta">
+                            {% if purchase.show_buy %}
+                                <a class="btn btn-primary btn-pill" href="{{ purchase.buy_url }}">{{ purchase.buy_label }}</a>
+                                {% if purchase.buy_hint %}
+                                    <p class="meta course-detail-buy-hint">{{ purchase.buy_hint }}</p>
+                                {% endif %}
+                            {% elif not user.is_authenticated %}
+                                <a class="btn btn-primary btn-pill" href="{% url 'core:login' %}?next={{ request.path|urlencode }}">Войти, чтобы купить</a>
+                            {% elif purchase.buy_hint %}
+                                <p class="meta course-detail-buy-hint">{{ purchase.buy_hint }}</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="course-detail-body muted-band muted-band--yellow bento-mt-24">
+            <h2 class="why-heading course-detail-section-title">О курсе</h2>
+            <div class="course-detail-desc course-detail-desc--plain">
+                <p>{{ course.description }}</p>
+            </div>
+        </div>
+
+        {% if has_access %}
+        <div class="course-detail-body muted-band bento-mt-24 course-detail-lessons">
+            <h2 class="why-heading course-detail-section-title">Уроки</h2>
+            <div class="card-grid card-grid--2">
+                {% for lesson in course.lessons.all %}
+                    <article class="surface-card course-lesson-card {% if lesson.id in completed_lesson_ids %}lesson-done{% endif %}">
+                        <h3 class="{% if lesson.id in completed_lesson_ids %}lesson-done__title{% endif %}">{{ lesson.title }}</h3>
+                        <p class="meta">{{ lesson.duration_minutes }} мин.</p>
+                        <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:lesson_detail' course.slug lesson.id %}">Пройти</a>
+                    </article>
+                {% empty %}
+                    <article class="surface-card"><p>Уроки скоро появятся.</p></article>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="course-detail-body muted-band muted-band--yellow bento-mt-24">
+            <h2 class="why-heading course-detail-section-title">Тесты</h2>
+            <div class="card-grid card-grid--2">
+                {% for test in tests %}
+                    <article class="surface-card bento-highlight">
+                        <h3>{{ test.title }}</h3>
+                        <p>{{ test.description|default:"Проверьте знания по материалам курса." }}</p>
+                        <p class="meta">Вопросов: {{ test.questions.count }}</p>
+                        <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:take_test' course.slug test.id %}">Пройти тест</a>
+                    </article>
+                {% empty %}
+                    <article class="surface-card"><p>Тесты скоро появятся.</p></article>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

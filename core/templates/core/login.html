@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% block title %}Вход - EngVibe{% endblock %}
+{% block body_class %}page-auth{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+    <div class="container">
+        <form method="post" class="auth-card">
+            <h1>Вход</h1>
+            {% csrf_token %}
+            {% if next_url %}
+                <input type="hidden" name="next" value="{{ next_url }}">
+            {% endif %}
+            {{ form.non_field_errors }}
+            <label for="{{ form.username_or_email.id_for_label }}">Логин или email</label>
+            {{ form.username_or_email }}
+            {{ form.username_or_email.errors }}
+            <label for="{{ form.password.id_for_label }}">Пароль</label>
+            {{ form.password }}
+            {{ form.password.errors }}
+            <button type="submit" class="btn btn-primary btn-pill">Войти</button>
+            <p>Нет аккаунта? <a href="{% url 'core:signup' %}">Зарегистрироваться</a></p>
+        </form>
+    </div>
+</section>
+{% endblock %}

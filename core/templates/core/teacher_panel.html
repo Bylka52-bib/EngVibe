@@ -1,0 +1,109 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Панель преподавателя - EngVibe{% endblock %}
+{% block body_class %}page-teacher-panel{% endblock %}
+{% block content %}
+<section class="page-shell teacher-panel-page">
+    <div class="container">
+        <h1>Панель преподавателя</h1>
+        <div class="inline-actions teacher-panel-toolbar">
+            <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:course_create' %}">Создать курс</a>
+            <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:course_group_create' %}">Создать группу</a>
+            <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:lesson_create' %}">Добавить урок</a>
+            <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:test_create' %}">Создать тест с вопросами</a>
+        </div>
+
+        <section class="teacher-groups-section">
+            <h2 class="teacher-panel-section-title">Мои группы курсов</h2>
+            <div class="admin-list">
+                {% for group in course_groups %}
+                    <article class="surface-card panel-entity-card">
+                        <h3>{{ group.name }}</h3>
+                        <p class="meta">Тариф: {{ group.tariff_plan.name }} · курсов: {{ group.course_count }}</p>
+                        {% if group.description %}<p>{{ group.description|truncatewords:24 }}</p>{% endif %}
+                        <div class="inline-actions">
+                            <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:course_group_update' group.slug %}">Редактировать</a>
+                            <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:course_group_delete' group.slug %}">Удалить</a>
+                        </div>
+                    </article>
+                {% empty %}
+                    <article class="surface-card"><p class="meta">Вы ещё не создавали групп. Группа объединяет курсы для выбора при покупке тарифа.</p></article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="teacher-courses-section">
+            <h2 class="teacher-courses-section__title">Мои курсы</h2>
+            <div class="teacher-courses-list">
+                {% for course in courses %}
+                    <article class="surface-card teacher-course-card">
+                        <div class="teacher-course-card__layout">
+                            <div class="teacher-course-card__info">
+                                {% if course.thumbnail %}
+                                    <img loading="lazy" class="teacher-course-card__thumb" src="{{ course.thumbnail.url }}" alt="">
+                                {% endif %}
+                                <h3 class="teacher-course-card__title">{{ course.title }}</h3>
+                                <p class="meta teacher-course-card__meta">
+                                    {{ course.level }} · {{ course.duration }} · {{ course.price }} ₽
+                                    {% if course.is_premium %} · Премиум{% endif %}
+                                    {% if not course.published %} · Черновик{% endif %}
+                                </p>
+                                <p class="teacher-course-card__short">{{ course.short_description }}</p>
+                                <div class="inline-actions teacher-course-card__actions">
+                                    <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:course_update' course.slug %}">Редактировать курс</a>
+                                    <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:course_detail' course.slug %}">Открыть курс</a>
+                                    <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:course_delete' course.slug %}">Удалить курс</a>
+                                </div>
+                            </div>
+
+                            <div class="teacher-course-card__aside">
+                                <div class="teacher-course-block">
+                                    <h4 class="teacher-course-block__title">Уроки</h4>
+                                    {% if course.lessons.all %}
+                                        <div class="teacher-course-cards-row">
+                                            {% for lesson in course.lessons.all %}
+                                                <article class="teacher-mini-card">
+                                                    <p class="teacher-mini-card__name">{{ lesson.order }}. {{ lesson.title }}</p>
+                                                    <p class="meta teacher-mini-card__meta">{{ lesson.duration_minutes }} мин.</p>
+                                                    <div class="inline-actions teacher-mini-card__actions">
+                                                        <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:lesson_update' lesson.id %}">Изменить</a>
+                                                        <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:lesson_delete' lesson.id %}">Удалить</a>
+                                                    </div>
+                                                </article>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <p class="meta teacher-course-block__empty">Уроков пока нет.</p>
+                                    {% endif %}
+                                </div>
+
+                                <div class="teacher-course-block">
+                                    <h4 class="teacher-course-block__title">Тесты</h4>
+                                    {% if course.tests.all %}
+                                        <div class="teacher-course-cards-row">
+                                            {% for test in course.tests.all %}
+                                                <article class="teacher-mini-card">
+                                                    <p class="teacher-mini-card__name">{{ test.title }}</p>
+                                                    <p class="meta teacher-mini-card__meta">{{ test.questions_count }} вопр.</p>
+                                                    <div class="inline-actions teacher-mini-card__actions">
+                                                        <a class="btn btn-primary btn-pill btn-compact" href="{% url 'core:test_update' test.id %}">Изменить</a>
+                                                        <a class="btn btn-outline-pink btn-pill btn-compact" href="{% url 'core:test_delete' test.id %}">Удалить</a>
+                                                    </div>
+                                                </article>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <p class="meta teacher-course-block__empty">Тестов пока нет.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <article class="surface-card"><p class="meta">У вас пока нет закрепленных курсов.</p></article>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}

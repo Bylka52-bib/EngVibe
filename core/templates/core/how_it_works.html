@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Как это работает – EngVibe{% endblock %}
+{% block body_class %}page-how-it-works{% endblock %}
+{% block content %}
+<section class="page-shell how-it-works-page">
+    <div class="container">
+        <div class="muted-band how-hero">
+            <h1>Как учиться на EngVibe</h1>
+            <p class="page-lead">Четыре простых шага – от выбора тарифа до уверенного владения языком. Всё прозрачно, без лишней бюрократии.</p>
+        </div>
+
+        <div class="how-steps-full">
+            <div class="steps-grid steps-grid--full">
+                <article class="step-card step-card--detail">
+                    <span class="step-card__num">01</span>
+                    <h3>Оформи тариф</h3>
+                    <p class="step-card__tagline">Подписка открывает курсы на срок</p>
+                    <div class="step-card__body">
+                        <p>Выберите тариф под свои цели: доступ ко всем курсам или к выбранному набору. После оформления подписки материалы становятся доступны в личном кабинете.</p>
+                        <p>Если нужен отдельный курс – его можно приобрести в каталоге без подписки на всю платформу.</p>
+                    </div>
+                </article>
+                <article class="step-card step-card--detail">
+                    <span class="step-card__num">02</span>
+                    <h3>Проходи уроки</h3>
+                    <p class="step-card__tagline">Интерактивные материалы и задания</p>
+                    <div class="step-card__body">
+                        <p>Уроки построены от простого к сложному: теория, примеры, упражнения. Материалы можно проходить в удобном темпе – прогресс сохраняется автоматически.</p>
+                        <p>Конструктор уроков поддерживает текст, изображения, таблицы и видео – обучение остаётся наглядным и живым.</p>
+                    </div>
+                </article>
+                <article class="step-card step-card--detail">
+                    <span class="step-card__num">03</span>
+                    <h3>Практикуй</h3>
+                    <p class="step-card__tagline">Разговоры, тесты и упражнения</p>
+                    <div class="step-card__body">
+                        <p>Закрепляйте знания через тесты, игры «Карточки со словами» и «Составь предложение». Регулярная практика помогает не забывать выученное и чувствовать язык естественнее.</p>
+                        <p>Кураторы поддерживают на пути – отвечают на вопросы и помогают не сбиться с ритма.</p>
+                    </div>
+                </article>
+                <article class="step-card step-card--detail">
+                    <span class="step-card__num">04</span>
+                    <h3>Достигай целей</h3>
+                    <p class="step-card__tagline">Получай сертификаты и результаты</p>
+                    <div class="step-card__body">
+                        <p>Отслеживайте прогресс по курсам и уровням в профиле. Завершённые модули и успешные тесты – ощутимый результат вашей работы.</p>
+                        <p>По итогам обучения вы получаете сертификаты, которые можно использовать в портфолио и при поиске работы.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <div class="surface-card bento-highlight how-cta-band">
+            <h2>Готовы начать?</h2>
+            <p class="page-lead how-cta-lead">Выберите курс или тариф – и сделайте первый шаг уже сегодня.</p>
+            <div class="inline-actions how-cta-actions">
+                <a class="btn btn-primary btn-pill" href="{% url 'core:courses' %}">Выбрать курс</a>
+                <a class="btn btn-outline-pink btn-pill" href="{% url 'core:tariffs' %}">Смотреть тарифы</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
