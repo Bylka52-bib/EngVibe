@@ -28,5 +28,8 @@ tzdata==2025.2
 
 webencodings==0.5.1
 
+setuptools>=65.0.0
 
-gunicorn==20.1.0
+whitenoise
+
+gunicorn==21.0.0
