@@ -130,10 +130,18 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_URL = 'core:login'
 LOGIN_REDIRECT_URL = 'core:profile'
 LOGOUT_REDIRECT_URL = 'core:home'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://engvibe-production-720c.up.railway.app',
+]
+
+
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True

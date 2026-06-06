@@ -5909,4 +5909,8 @@ body.mobile-menu-open {
   body.page-about .about-reviews-row {
     grid-template-columns: 1fr;
   }
+
+  body.page-reviews .reviews-bento-grid {
+    grid-template-columns: 1fr;
+  }
 }
