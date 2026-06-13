@@ -276,10 +276,12 @@ main {
   position: absolute;
   top: 60px;
   left: 115px;
-  z-index: -10;
+  left: 50%;
+  transform: translateX(calc(-50% - 160px));
+  width: min(922px, 90vw);
+  height: auto;
   pointer-events: none;
-  width: 922px;
-  height: 592px;
+  z-index: -10;
 }
 
 .hero-left-wrap {
@@ -517,11 +519,13 @@ main {
 
 .why-blob-bg {
   position: absolute;
-  width: 1240px;
+  width: min(1240px, 100vw);
   height: 485px;
+  object-fit: contain;
   z-index: -10;
   pointer-events: none;
-  left: 120px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .why-layout {
@@ -838,11 +842,13 @@ main {
 
 .about-blob {
   position: absolute;
-  width: 1234px;
+  width: min(1234px, 100vw);
   height: 365px;
+  object-fit: contain;
   z-index: 0;
   pointer-events: none;
-  left: 120px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .about-steps-grid {
@@ -946,11 +952,13 @@ main {
 
 .faq-blob {
   position: absolute;
-  width: 594px;
+  width: min(594px, 100vw);
   height: 710px;
+  object-fit: contain;
   z-index: 0;
   pointer-events: none;
-  left: 120px;
+  left: 50%;
+  transform: translateX(calc(-50% - 320px));
   margin-top: 389px;
 }
 
